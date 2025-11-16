@@ -1,0 +1,31 @@
+{
+  "name": "fluidtools",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000f\u0000l\u0000u\u0000i\u0000d\u0000t\u0000o\u0000o\u0000l\u0000s\u0000\r\u0000 \u0000",
+  "homepage": "https://github.com/KartikJoshiUK/fluidtools#readme",
+  "bugs": {
+    "url": "https://github.com/KartikJoshiUK/fluidtools/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KartikJoshiUK/fluidtools.git"
+  },
+  "license": "ISC",
+  "author": "Kartik Joshi",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+  "build": "tsc",
+  "start": "npm run build && node dist/index.js"
+  },
+  "dependencies": {
+    "@langchain/community": "^1.0.3",
+    "@langchain/core": "^1.0.5",
+    "@langchain/langgraph": "^1.0.2",
+    "@langchain/ollama": "^1.0.1",
+    "axios": "^1.13.2",
+    "langchain": "^1.0.4",
+    "typescript": "^5.9.3",
+    "zod": "^3.25.76"
+  }
+}
