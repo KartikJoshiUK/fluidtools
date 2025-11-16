@@ -3,18 +3,19 @@ import axios, { AxiosError } from "axios";
 import { z } from "zod";
 
 import { tool } from "langchain";
-import { ChatOllama } from "@langchain/ollama";
 import { createAgent } from "langchain";
 
 import { ACCESS_TOKEN } from "./config.js";
+import { createProvider } from "./src/providers/factory.js";
+import { loadProviderConfigFromEnv } from "./src/providers/config.js";
 
 // -----------------------------------------------------
 // 1. Fully flatten Postman JSON (works for ANY depth)
 // -----------------------------------------------------
-function flattenPostman(postmanCollection : any) {
-  const result : any[] = [];
+function flattenPostman(postmanCollection: any) {
+  const result: any[] = [];
 
-  function recurse(items : any) {
+  function recurse(items: any) {
     for (const item of items) {
       if (item.item && Array.isArray(item.item)) {
         // It is a folder → go deeper
@@ -41,14 +42,14 @@ console.log(`\n📌 Total ${flatRequests.length} APIs found.\n`);
 // -----------------------------------------------------
 // 3. Utility: Extract URL from postman item
 // -----------------------------------------------------
-function getUrl(item : any) : string {
+function getUrl(item: any): string {
   return item?.request?.url?.raw ?? "";
 }
 
 // -----------------------------------------------------
 // 4. Generate LangChain tools from flattened list
 // -----------------------------------------------------
-function generateTools(requests : any) {
+function generateTools(requests: any) {
   const toolsArray = [];
 
   for (const item of requests) {
@@ -61,7 +62,7 @@ function generateTools(requests : any) {
       query: z.string().optional()
     });
 
-    const fn = async (args : any) => {
+    const fn = async (args: any) => {
       const payload = args.body ?? {};
 
       console.log("\n🛠️ TOOL START");
@@ -88,7 +89,7 @@ function generateTools(requests : any) {
 
         return JSON.stringify(res.data, null, 2);
 
-      } catch (err ) {
+      } catch (err) {
         console.log("🔴 TOOL ERROR:", (err as AxiosError).response?.data);
         return `Error calling ${url}: ${err}`;
       }
@@ -112,10 +113,8 @@ const tools = generateTools(flatRequests);
 // -----------------------------------------------------
 // 5. Model + Agent
 // -----------------------------------------------------
-const model = new ChatOllama({
-  model: "llama3.2:3b",
-  baseUrl: "http://localhost:11434",
-});
+const providerConfig = loadProviderConfigFromEnv();
+const model = createProvider(providerConfig);
 
 const agent = createAgent({
   model,
