@@ -1,0 +1,102 @@
+import axios from 'axios';
+
+// Generated LangChain tools from Postman collection
+// Collection: logger
+
+export function generateTools(tool: any, z: any, authToken?: string) {
+  const tools: Record<string, any> = {};
+
+  // http://localhost:8000/api/sign-up
+  const http___localhost_8000_api_sign_up = tool(
+    async (args: any) => {
+      try {
+        const res = await axios.post('http://localhost:8000/auth/signup', args.body || {}, {
+          headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
+        });
+        return JSON.stringify(res.data, null, 2);
+      } catch (err: any) {
+        console.log("🚨 API ERROR");
+        return `Error: ${err.message}`;
+      }
+    },
+    {
+      name: 'http___localhost_8000_api_sign_up',
+      description: 'hii this is something you should noticed? lets go bro',
+      schema: z.object({
+        body: z.any().optional(),
+      }),
+    }
+  );
+  tools["http___localhost_8000_api_sign_up"] = (http___localhost_8000_api_sign_up);
+
+  // http://localhost:3000/api/data
+  const http___localhost_3000_api_data = tool(
+    async (args: any) => {
+      try {
+        const res = await axios.post('http://localhost:8000/auth/signin', args.body || {}, {
+          headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
+        });
+        return JSON.stringify(res.data, null, 2);
+      } catch (err: any) {
+        console.log("🚨 API ERROR");
+        return `Error: ${err.message}`;
+      }
+    },
+    {
+      name: 'http___localhost_3000_api_data',
+      description: 'Creates a new signin. Endpoint: POST http://localhost:8000/auth/signin',
+      schema: z.object({
+        body: z.any().optional(),
+      }),
+    }
+  );
+  tools["http___localhost_3000_api_data"] = (http___localhost_3000_api_data);
+
+  // New Request
+  const post_taskhive = tool(
+    async (args: any) => {
+      try {
+        const res = await axios.post('http://localhost:8000/taskhive/workspaces', args.body || {}, {
+          headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
+        });
+        return JSON.stringify(res.data, null, 2);
+      } catch (err: any) {
+        console.log("🚨 API ERROR");
+        return `Error: ${err.message}`;
+      }
+    },
+    {
+      name: 'post_taskhive',
+      description: 'Creates a new workspaces. Endpoint: POST http://localhost:8000/taskhive/workspaces',
+      schema: z.object({
+        body: z.any().optional(),
+      }),
+    }
+  );
+  tools["post_taskhive"] = (post_taskhive);
+
+  // New Request
+  const get__workspaceId = tool(
+    async (args: any) => {
+      try {
+        const res = await axios.get('http://localhost:8000/taskhive/workspaces/:workspaceId/tasks', {
+          headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
+        });
+        return JSON.stringify(res.data, null, 2);
+      } catch (err: any) {
+        console.log("🚨 API ERROR");
+        return `Error: ${err.message}`;
+      }
+    },
+    {
+      name: 'get__workspaceId',
+      description: 'Retrieves information about tasks. Endpoint: GET http://localhost:8000/taskhive/workspaces/:workspaceId/tasks',
+      schema: z.object({
+        query: z.string().optional(),
+      }),
+    }
+  );
+  tools["get__workspaceId"] = (get__workspaceId);
+
+  return tools;
+}

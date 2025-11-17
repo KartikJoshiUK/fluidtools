@@ -1,547 +1,159 @@
 {
 	"info": {
-		"_postman_id": "de21c72f-f999-4e11-9991-e7aa8cc27983",
-		"name": "Ace Cloud",
+		"_postman_id": "30d17231-da7a-4405-b400-da80507aacf3",
+		"name": "logger",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "19779366"
+		"_exporter_id": "29361361",
+		"_collection_link": "https://astronout-rocketbiz.postman.co/workspace/jatin~8f2e5507-ac83-4cf6-9c5d-97788a2b9c08/collection/29361361-30d17231-da7a-4405-b400-da80507aacf3?action=share&source=collection_link&creator=29361361"
 	},
 	"item": [
 		{
-			"name": "Key Pairs",
-			"item": [
-				{
-					"name": "List Key Pairs",
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept-Language",
-								"value": "en-US,en;q=0.9,en-IN;q=0.8"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer ACCESS_TOKEN"
-							},
-							{
-								"key": "Connection",
-								"value": "keep-alive"
-							},
-							{
-								"key": "Referer",
-								"value": "https://customer.acecloudhosting.com/v1/en/key-pairs?region=ap-south-noi-1&timezone=Asia%2FCalcutta&id=2272&project_id=6912690968ce46cb8ac7b4a96e91beee"
-							},
-							{
-								"key": "Sec-Fetch-Dest",
-								"value": "empty"
-							},
-							{
-								"key": "Sec-Fetch-Mode",
-								"value": "cors"
-							},
-							{
-								"key": "Sec-Fetch-Site",
-								"value": "same-origin"
-							},
-							{
-								"key": "User-Agent",
-								"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0"
-							},
-							{
-								"key": "baggage",
-								"value": "sentry-environment=production,sentry-public_key=e1f46d92a21e98c8d6da449b8633f575,sentry-trace_id=2d46104dd2f045368be52eb2735b5757,sentry-org_id=4506139955953664,sentry-transaction=%2F%3Alang%2Fkey-pairs,sentry-sampled=false,sentry-sample_rand=0.973350793807624,sentry-sample_rate=0.1"
-							},
-							{
-								"key": "sec-ch-ua",
-								"value": "\"Chromium\";v=\"142\", \"Microsoft Edge\";v=\"142\", \"Not_A Brand\";v=\"99\""
-							},
-							{
-								"key": "sec-ch-ua-mobile",
-								"value": "?0"
-							},
-							{
-								"key": "sec-ch-ua-platform",
-								"value": "\"Windows\""
-							},
-							{
-								"key": "sentry-trace",
-								"value": "2d46104dd2f045368be52eb2735b5757-9a7ad392d73fdc3c-0"
-							},
-							{
-								"key": "Cookie",
-								"value": "useNewTheme=true; __stripe_mid=eeaac890-fbb5-4e56-a35c-5c8beeecff43bf1c4c; rtdsportal-_zldp=r9SKnJByViBJbpGGQCg4sMSc8cu7ArqNXMbd2wvb8g2DL8kTzFo7BlWZo8iWKZuBCM5f4TtJTsA%3D; rtdsportal-_zldt=2cd548cb-9cce-4992-841f-320b09cdb045-0; currentRegion=ap-south-noi-1; next-auth.csrf-token=f085b402fbbcd20cfb333beecb56f26a0ec9a0808060c811c016bdf0ee954930%7Ce8fd93ad8b8aa977b75402a73e8b2b7d7f2258ae214d6a8adba5d4676ae8a545; next-auth.callback-url=http%3A%2F%2Flocalhost%3A3000; WHMCSFR44VD4mpvF4=it5lk8l05gb3hdqthu7vfe030j; userremember=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0a3ZhbCI6ImNEVWdsYnhFYWhPVyIsInVpZCI6MjYyMCwibG9naW5fYXV0aF90ayI6IntcImlkXCI6Mjg4OSxcImVtYWlsXCI6XCJrYXJ0aWtqb3NoaXVrK2NsaWVudDNAZ21haWwuY29tXCIsXCJwYXNzd29yZFwiOlwiZTI1N2JmMjljMjc2OGIzYjhjZDZiNTZjZjZkNzYwNGE5ZWM0MjhlNDA5YTE3ZDlhY2U3YzQ2ZjYxZDU2YzI0NVwiLFwidXNlcmlwXCI6XCIxNS4yMDcuMjI1LjE0MVwiLFwidGltZXN0YW1wXCI6MTc2MzI5NTkxNCxcImhhc2hcIjpcIjQ1ZjcyNWZiNjdjMGJjN2U2MDNlOWZlNDZmOTExNGIxZjRiZWExZDk4YTJjMDY2OGJlYWI0MTc5MWRlYjQxZTVcIn0iLCJpc3MiOiJodHRwczpcL1wvY3VzdG9tZXIuYWNlY2xvdWRob3N0aW5nLmNvbSIsImF1ZCI6Imh0dHBzOlwvXC9jdXN0b21lci5hY2VjbG91ZGhvc3RpbmcuY29tIiwiaWF0IjoxNzYzMjk1OTE0LCJleHAiOjE3NjM1NTUxMTR9.6gERGW_J15NMWvN7y_2dF2hP764gUDXMfRXYsUaTklZSzynZ0L-C0CSnXr9rG4VVpWYhtqJadi_UzwvAwzutF5OXcaqmG6TIAiDH_SdJsdpViGL4LJCycYzmJgCgtrZbFg8P9eosYh29p9aETjgyL9gawtYEAmVB-55I6aymag4BqTqam_4x4ZyKtEJHoGX3vNqbk2BLG1AdncxBr5Vby2516FuZGmfJGO65hoEtBm8_ciqQQwRzTV4WMPm_xgreSvy7NVIaVeM1NsB0xOAVgaxm0dSoIP8wkluuu3nn6JRR1Pr42pvzKxkZ7pP7qMWnlwnY7tDYfQ4iUOhJ3V6OcA; isPrepaidClient=true; colorPref=dark; next-auth.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..8TUJX05i7qsjAJtW.OKYLl39R5PUgw5xHvP6TYr_bsJYMbnr2AVQN1tT7DhUHfUyXKK25DtnkgFuFbgN3A2zTjaDO5thDDss0ZQBgpyrG0CloIIIQqx1Ksl5n6rJURksq_Es6lWNI04sRRgCG_JpPqYrykDksYQNpMLW8j6lEOSALHHnn8JwtusCGVMr4IcMx2qdftFJ5HTFUKU6jgEZkqmG6B_vrcAnKO3IGJX1IWGB0g5WUhSYM3W6XICoZHvc3iJeh7xHgKbmQPAxY6aTAInrv4gwDem0U6LzWlJKJg6CjUBJ_pYId57GWWt6TTJ9Ux-XIeT52zmCayOwtM04i-o-h0bORkaEFs0Xrw_5OA3dN2_Fqh8cwdKX9KstfSQRCiAPum2g3mhPWeieH7tnq4Jv1Fxm8zE5CrCOPv7F1apXvf9God4Z_PZ1L_ZWjhHMAPWkBNfODJtghbmLvaYJ14ssMKMBOKsplHlpn1RN6q88_lW5YF4P4txdQPYuFws0o4Sccz_fr5Zo-1uHJoYtI-Ewt87WyIiJe93GHlEHhF7Gv8OFsTbOZVdqHPspjDw_5KPNxQ3KA8ROn3KumHRIgECcYffOgYjSGqKajlWff2JQbjFVQbwNkLax5i4QMOKnbpP40rt1Ca5z3TiMr7wu3qhOVuE8o9j1bUyy2erI7-iAlh_BclUbSTZPN0p2M_end0jWw6giHgo-sACdjP6tgKdMje8RpO0WVBhWalrtOngZqsjRbj59vZYJr39wFbU5RZ7DGV5dEJ0aYm5ZbDuCT4ZszvwR20r95kqQ19K3XeZ2FlWOyU7jldovBHe2PhnZzmpR9qe6wiTfnGmcg8Efvqx7ECsmY0nNLDTZmy-ZiWHzzgL5HUhkUOIp45CAjfb2EusRVryRVg5TXK2jgGxeYPcDnlorLPi820YRdPlGRORGAUxxQxuBlq8dnzlt4MojFDHKHCvdrrxHqzoUVIq2YYaiodNkFeaZX2vlHFoDEXJ0foTAu3NHWcfqYaHX2fbHUL5P_p22i4o038DTC7mBnmna4bIBHG79OtCNHGvsUC-7AdkPE1SuoA3ckI7x2be_NJ6rnBJ9lHdc4HzaIQnBwaAYtYb1GsLAk19nWGJrLYeuLC_C3yJUY58UEUjM_0HOZMLHj3rU4Aa0W2t4rLiR2YwLfPhNZWBM9WYcp6NEhNJV5bdgCoNBFohZdu2BPDsG8gDjprGti8kIO8A3BoxLDd_nwQzBse1v9nwMDXNpn-zsAkNWHifDtLYpwXmq9KDJOFD2bLYCo71pOs2RWKaWCsaNEijJvGniLEDRU0uq3E__Muol0dloAB4GVx1RcYleYbGa8ZAiMA68OAcLoQ5j1iQ0jZzg25YQqVKKn-wh1UujqmcikY8PS4i86WQHWQ2GXKPVABgB10gIjCqgZ_sM8uR-yMD7bIXSGI_ZbDZ2TAyDOs-xUWjdZSIp2qqs5BK3v6mhsu9kE4ElaqWJpRi9HmNXbeDNmnt9Hc1zUZOy18SY3AUR-Jh6nyRNZPZKM6jd6lRPmXwg0FIOP2LGrASLW8_Ew0TN479hsFeV2HVa5F8SSV5UnVIO2OYrqsJa2nVStl_ZRFg1mki_gqqh58_Fmw5xBOVqebtrhX5swLo6oM8kXYZXaVRCbTTJibp0LxkI5IHYq2X1ecJvOYjoZEud7eUNid3i2tx-j4qG-nWShvwgVR4AEkirZGoGLnkJeIp1leGzArvAgabsHOyctWnKaYEzojP-kf8_O4Lbb20Dpg6XYhIC2EOJQR7tXgVpk-ER_ug7x34eyaD8HnPxpDKbVVt7LJZnrUuWTaTqoONvH7fSlXxbR0A8uCu5t4xco38FES44Fp54w-1VoKXDjkgUdDrH6OFmObjBg-0Fq9_p4jyfSZdfoK0J43nCuVfgpVcpMoyV7teF-q1l0wcWdtMBoFitb-liobiK20cGxjfL5BSwBTS4KmKEglOmTU0xeRxX_W0-HETzEwTMYd9lQuYG0St4NywgS22gtv8q49SUTy-0ddOrCIRElxmnNbulrSMA8_juX5eY4DqynSXqUPk-d3CCOhWH06N29r_zUWdbhh-Hdpi3YJUIkFc7vtQlfos0ysZOSfL5iqiS0Acw98aqa5bujLnXbU1jRIulwC-QL9qQzkVGRiA0ngNpyYT4ZDIrTdwprH42BloqXB9wioqyzes_oOgbaRZkUeL5allEgXMbfRncA74Ap5TSoLsGum646oPtYkcoZig9aH3beXy0Pksfk5AU-iI7VjJcOsofRgE6-hqRXy9DvvNSE-2XwqC-nYlntUtjr0U8uHFuvdG0p8y4vDhdLGFUhsmLV_udRn0Vc6etce6LodW5cYcO2B8oMAZ3NVv8dK5xHGEVGTDa97XkbUnFMctf6o7G6IrstZS66DYhnv1JwCORT_p1w9pZVzEwQdKWfy9KIxGaCIRq-hnk8BHe_4zvy-bqLfv3r5Njz8wpS0QH3VZHZvEGEV-MpZnTDi8aYPAoHd9ik2nGbt3ddT2No0ipdiYAsM5a29hvsLtYomLZSrwpWrMx3qq6SwHe9n3wxxfmBCx9ruL_AEYmC_6GsDOqZ-AnV3IbldtiybmGPc3Y7WE6X0EDxoqBeYMvTHdcn0HZ7FRKoqouM01RrjDU6yf4MltJMIxb8lnD_FB3reQnvAshLpP_6YsaT25VJmU_nUc2n7LzFTcsZ6HbVTHQsmcHeghXBeHCNuDY7dwhgib96sxKqHErLg4GmB0-qaffY05COt2lJt8TryLova0m4AxtxFfWwq9-AGAPKJiBce3cFkh9Whg2zOH_jEwfBBnRUAPhzEzztbjmItuWG-IH-agmZPYiDQJKaWVcluDr18J0V6M_Lzgl09phvpGj1wv-L8Cxcepci_dHrCWn-FIHCREcIlxeqFDXOyzQU3Wl6-31yg0pc-7qDLhiYX20tg5jqImrRBtMVHGX0Nf_HHvgFzoo62yCqO2DXbgdQ6o1PTHxa-lp9p4t3g51_CldKlJoI6YnLZ_fKihzFFhWkxohz553GVIsqrlotbPxkwESqRO8MZD3SBXMSs7EOi9YSuGNzcDEu3emN3-9SJ3WGHZ-xjJLH_d_7BY7axfGKedCwJVT_f3dfEWlWJVThHlD27tXXfhsulszlzYmGruALQTMEUKSz_Lhvb_Zlipw0V-5_pgKx2QPLlEMwWw2szi6kRvGzW03_YxRabG6yg-mcMTbbSbJs2HnepckZVMKTUBornFZyyMq1iLPDitsGcrQpdFYij_lECtXk5kMs06Xbr9sYVTIQY_nLQoqAlNlBUKNlJw9s1ENIQfhgcEqTaGCdL2DJgiwK2ISDaRpvmAmHe7FB7WkmJv45a6a6bv4kfGt3jbDj6u_dMn1ANRq9nSYJRFqYUqLgAuopeWyMPKAlSQZ1G7Bp9mahu2dvMLAibPE4PfjGGNbFnBs9sT-Ro2EJbjOHwg.pS-uYHlIZZtoIkJSV_rvfQ"
-							}
-						],
-						"url": {
-							"raw": "https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee",
-							"protocol": "https",
-							"host": [
-								"customer",
-								"acecloudhosting",
-								"com"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cloud",
-								"key-pairs"
-							],
-							"query": [
-								{
-									"key": "region",
-									"value": "ap-south-noi-1"
-								},
-								{
-									"key": "project_id",
-									"value": "6912690968ce46cb8ac7b4a96e91beee"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Key Pair",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Accept",
-								"value": "application/json"
-							},
-							{
-								"key": "Accept-Language",
-								"value": "en-US,en;q=0.9,en-IN;q=0.8"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer ACCESS_TOKEN"
-							},
-							{
-								"key": "Connection",
-								"value": "keep-alive"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Origin",
-								"value": "https://customer.acecloudhosting.com"
-							},
-							{
-								"key": "Referer",
-								"value": "https://customer.acecloudhosting.com/v1/en/key-pairs?region=ap-south-noi-1&timezone=Asia%2FCalcutta&id=2272&project_id=6912690968ce46cb8ac7b4a96e91beee"
-							},
-							{
-								"key": "Sec-Fetch-Dest",
-								"value": "empty"
-							},
-							{
-								"key": "Sec-Fetch-Mode",
-								"value": "cors"
-							},
-							{
-								"key": "Sec-Fetch-Site",
-								"value": "same-origin"
-							},
-							{
-								"key": "User-Agent",
-								"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0"
-							},
-							{
-								"key": "baggage",
-								"value": "sentry-environment=production,sentry-public_key=e1f46d92a21e98c8d6da449b8633f575,sentry-trace_id=2d46104dd2f045368be52eb2735b5757,sentry-org_id=4506139955953664,sentry-transaction=%2F%3Alang%2Fkey-pairs,sentry-sampled=false,sentry-sample_rand=0.973350793807624,sentry-sample_rate=0.1"
-							},
-							{
-								"key": "sec-ch-ua",
-								"value": "\"Chromium\";v=\"142\", \"Microsoft Edge\";v=\"142\", \"Not_A Brand\";v=\"99\""
-							},
-							{
-								"key": "sec-ch-ua-mobile",
-								"value": "?0"
-							},
-							{
-								"key": "sec-ch-ua-platform",
-								"value": "\"Windows\""
-							},
-							{
-								"key": "sentry-trace",
-								"value": "2d46104dd2f045368be52eb2735b5757-8f29ebd0544cf9b7-0"
-							},
-							{
-								"key": "Cookie",
-								"value": "useNewTheme=true; __stripe_mid=eeaac890-fbb5-4e56-a35c-5c8beeecff43bf1c4c; rtdsportal-_zldp=r9SKnJByViBJbpGGQCg4sMSc8cu7ArqNXMbd2wvb8g2DL8kTzFo7BlWZo8iWKZuBCM5f4TtJTsA%3D; rtdsportal-_zldt=2cd548cb-9cce-4992-841f-320b09cdb045-0; currentRegion=ap-south-noi-1; next-auth.csrf-token=f085b402fbbcd20cfb333beecb56f26a0ec9a0808060c811c016bdf0ee954930%7Ce8fd93ad8b8aa977b75402a73e8b2b7d7f2258ae214d6a8adba5d4676ae8a545; next-auth.callback-url=http%3A%2F%2Flocalhost%3A3000; WHMCSFR44VD4mpvF4=it5lk8l05gb3hdqthu7vfe030j; userremember=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0a3ZhbCI6ImNEVWdsYnhFYWhPVyIsInVpZCI6MjYyMCwibG9naW5fYXV0aF90ayI6IntcImlkXCI6Mjg4OSxcImVtYWlsXCI6XCJrYXJ0aWtqb3NoaXVrK2NsaWVudDNAZ21haWwuY29tXCIsXCJwYXNzd29yZFwiOlwiZTI1N2JmMjljMjc2OGIzYjhjZDZiNTZjZjZkNzYwNGE5ZWM0MjhlNDA5YTE3ZDlhY2U3YzQ2ZjYxZDU2YzI0NVwiLFwidXNlcmlwXCI6XCIxNS4yMDcuMjI1LjE0MVwiLFwidGltZXN0YW1wXCI6MTc2MzI5NTkxNCxcImhhc2hcIjpcIjQ1ZjcyNWZiNjdjMGJjN2U2MDNlOWZlNDZmOTExNGIxZjRiZWExZDk4YTJjMDY2OGJlYWI0MTc5MWRlYjQxZTVcIn0iLCJpc3MiOiJodHRwczpcL1wvY3VzdG9tZXIuYWNlY2xvdWRob3N0aW5nLmNvbSIsImF1ZCI6Imh0dHBzOlwvXC9jdXN0b21lci5hY2VjbG91ZGhvc3RpbmcuY29tIiwiaWF0IjoxNzYzMjk1OTE0LCJleHAiOjE3NjM1NTUxMTR9.6gERGW_J15NMWvN7y_2dF2hP764gUDXMfRXYsUaTklZSzynZ0L-C0CSnXr9rG4VVpWYhtqJadi_UzwvAwzutF5OXcaqmG6TIAiDH_SdJsdpViGL4LJCycYzmJgCgtrZbFg8P9eosYh29p9aETjgyL9gawtYEAmVB-55I6aymag4BqTqam_4x4ZyKtEJHoGX3vNqbk2BLG1AdncxBr5Vby2516FuZGmfJGO65hoEtBm8_ciqQQwRzTV4WMPm_xgreSvy7NVIaVeM1NsB0xOAVgaxm0dSoIP8wkluuu3nn6JRR1Pr42pvzKxkZ7pP7qMWnlwnY7tDYfQ4iUOhJ3V6OcA; isPrepaidClient=true; colorPref=dark; next-auth.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..BrqgPTo8mAzqRCCR.xq8H-d1LYBbr8PHWfqyMKjj_3OlxRzlWPh1gNiO5CMzqW800LxIXoKyK_e4OvMreEroEmBZykz945oBiteqSsFFFfzkpnnNqZl0Cvt8LuudSVVLv_NlKcXgmpkAKKULzUJ2CdPFEaRl0BT4FKxzqSrrIEOVYvZdlvLIBmTGm0s7zUo75Q6SSLrZBPQW9nteJb3X6fnRDDqmSMuao3EzgIXzhKB4yvKqLK8gW3f3bSIRdwz0IE51J4wSGAMAq4SSddLvTu82GcYcgaTPlgwa8YScTze2YsqkelG4RgbsivFmKKDPdRyW1bEb1pWWysEMVJk94mkRDlQUe-WvHMesFk8xY1XeCzlugq8MF9MuMcQIu75Nbp2CqTUaZsOwn6O23TTd7WPGUK9lIoiamo4PcpebSs0wO28INivjMXy7HMmKdpBOPaaCz6odiL-Moz4cewomY5wo6Y8FcVF7Uwys4GFCDI7O46zqOZmHb7vmKxPISz1P8FJuKR_EI6e3xKmKqLaOMny-gUHpCcmVtEoVi04JBtUWfMFFaOu50TB4KejJSHJzB0PWW3nBUV3hOoemRIsI2vV0EJPyHeqmstyuyMVUYMCI1GxYzHsz4uk7yVuCBUpopRFh6HcYztMxAsMS-vkzB2jbpCZ0X0pzJ4bJ_x8OdIjykFE5ur3MeV_Q2nMatSnFx6FPLX3vByrNp6aidZ8Pkwcn3zmw27BaRlNHJBkuhnK15KVbNHupmiDtv-6f0vGS5ZPJabh3BNtJd3o8YpgUt90BLaMJ46vPI3HW4ftqNVYqr5tfTq5dNXxGSgxrQcjPYqmXQViYS-7CRRCqjOn4qVsFQzvanfo6_HS8gLayw2aVWoVDfI0VC8QdAUKFGrpsE8I0CHEabrdnZBwp3la97MoHqkxJDsNsIPQRv1MFY9z4Ctf3t3wtVgKU3_GgBjtA7iK2aQ87SMxvaxr-A6kUG_tj436exUc9_qO3h3nRoX8wnAe04BxnULPfqQKVEtk3hu8mUQ2DGu8TSXNhtaYW4yIY-b9r4bYhOBFB_SALhcDgU4_QSrjUhqzV_97xh-6yEzEZmhmCc0Of9PS1pI25_CQHDP-ga1yv0i_G46eLyeJSF0tZCq8fvlugpt-3intHg5HDsutUR1ghO7tmLDCB14royCOv1o9V6Sd3jZumgUcPhJWPExKunScrzeS-vaz9ypUh0Zmr6lLeCUWi5RoqtNAfy8YyeQr64MLTH5xCN2j9YQNQo7VpZZYE8WZoRwAf0-wsiJ9m8HQezUoVjtBywjR4-mn_30-EtQ63VI6EKnBEGJRKs2YQNPGxZaAqwJrs_dWWw_8ul6ovqi9B4nPuXvkG_D6Z618-Zq3VQMgFl0Y2UNv8iPQP9ny7oeZBFVtBSjD469XMIfX1FmQaZFjxEW72YulqOVsM-E872R_CIBg1qMGB4Mvzy0zjVyvyY4oub_4d8pqsLyIFvu_tl6kZAgkpwgaCeDlq778E82dHQOQLfgDqK-j2CVlfvCIBaIBUCyr2v1VqqQd2gZSK6Zr5be7clrLNKaBPbpLlJsJ9xn-7csQVQP_yH6ufqCdCsu1A1lJcYceOEe0Sy7CXeCuBu7QnuY0tuPm3jjCeZ_ji97Qn9ZekEuKopt9UbYB5IiR3w-zNUTXcKtUrURiqMcqiLmgjiZbkmSHRoSJdtk5_calLQe0FOloH6jxih6nmO6PeGve-fuCYteC8rm8vmfERfEKR8jq4TuAX9JDnB2ct5ZH9oLzBaxj6q3e4liA7qh7ynquuJ2Sm_Ho-HMHs-XbaLIWZbjaNg8Km3qSVIP-IMMS3OhcP-xi3YhkrOnfz996EcLtchO4EqFvCIFimbb-t8sNJ3h-kuwRbPXvT1mwJc5uLO47_2mx5XiLHew_zPyElA50hBwWAYuvvuKIqWJCvlA3eyUJanhVM8udbF5s7ZSG-pFoM30fzWBEvb_LhrHJP4zEazVUpcZBV3nVJosEqpRkDahlzIPyvsKJbeqaDVfiaVEsqCXgBTH799Lo-sdErJvs6l12IkBnOvlBpHM9L-14fP-v4gAvURMbrER2wQvkdOrrEbid22kisFoTAx8W4egl8KrKQIsAGPLMnpxnYWJf5unjt9bR5mRGpdpNNiYpprkQHz_IfKwV6BAdMfbBDnn0ZB3o7kmSfJGpZZZoSK4z1xv1F24GZTafcbrvK53YX3yWu4KcsZth7lYmCEKnH-wP0EpObExfSHgGM1urS9reXtkE4PvbVB0Jws6NnHNskBYBnMlyQlAs47qkzvHY4nE9aAe98bd5t0N7kACMDmvWH9qgOUzsgWg3W3GfyQqpRsWILYMB2bljBTODnQ28eH_mfQ2XOIZFU8h83qVCUFxvJz6nC_Z4YWnabr3GZuiCdTB3syfG5PltOqT2rMRdecgr9HxPj91_EteC1X7dH3cX7VVLCKSNhFvzI1QlNR33GLxRraGqTYuibaLZaFOY1JzLy2hFX9xh7KcP1BX39AiJ0vwBsHo-ZKjvcV8WXuGF4I_3pTmhh3soas8MVm5XKhrn74Ce-4BSoPSfYsAP_lYZTgNLlF3Xp0HWE8mthQEIzPY5pWmwUcrvdI50NnTHqLIrPMn1W7N3tyUrgLfQ3yONa1DyIGYxw-lIovzopH3peRPIFJQfay9qx334C3_4dxcSZMZb0GoYgGE8USR47xAUAY6UFzm-uvXWKGviAGxTijXSWEwJyC2GTAKo4z_fX-px7F80VPpB6WP5Jro_u2WFyDCbmM9swKEFvsiYxaoxf_TIj4PeJ-gLz6g83i2wngAmGqLYeKmJZrY6wkSmXIJmXTIMCU9VPw_RTg3o80sEcbYzPona-DG02P2DJOSeGjBLgk8Wf1JKeyro5Jss6rCHfSH7g8zNXQVSuZd0tkNq4bmYjCFXGniw356uSPp068NE7JCQUObVKcTwaKZHeBH6SlodNufWUBZjE--SYpLy0x_28InoVOOkLKl0YqNDks-AnQCz-MSvjZ_ZG1bzt264zFY32mH5cyPANMtGNUyrUnPyOPXakibLplHN76Os5WOXsACERbeBDBOb2uTjxuuqgnF4HoiD73RGIvIchEbED7tse8HVrn2U-4-mOF3hvX3pL4vfJUcA1Y64wb02UhDmqVAEoD25qdEU_gofafOS_PpL4L3FlPYiZnafwvxI7PhMfgxyVJ84wnWPMl3B-VgK-U3o8AmjWriK2Gx9E5OUKXSTyb2sR8Zm7xknee_qbveOWBNQmlMOJlu_YuzdcZOhw55YqAVePmd0RpVeshNiBnh7hfyxXYJnv2t3d4N-gxFlfTaoqF2DawbsdpAmmnD9M6i0-z153ydNxw7Jt0nr13hTbWn8i3AazmcPqpeNCzt70nrsu1k7ULJl3wE0uOCe824uy1f2h--pCu2xDD97mUZHhNzDdqDSw6_tVvLv_OmpO4kB1vmQ.uAP5sTH_1C9mO-IwKKmHIw"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\"name\":\"My New KeyPair\"}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee",
-							"protocol": "https",
-							"host": [
-								"customer",
-								"acecloudhosting",
-								"com"
-							],
-							"path": [
-								"api",
-								"v1",
-								"cloud",
-								"key-pairs"
-							],
-							"query": [
-								{
-									"key": "region",
-									"value": "ap-south-noi-1"
-								},
-								{
-									"key": "project_id",
-									"value": "6912690968ce46cb8ac7b4a96e91beee"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Wallet Status",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
+			"name": "http://localhost:8000/api/sign-up",
 			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept-Language",
-						"value": "en-US,en;q=0.9,en-IN;q=0.8"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer ACCESS_TOKEN"
-					},
-					{
-						"key": "Connection",
-						"value": "keep-alive"
-					},
-					{
-						"key": "Referer",
-						"value": "https://customer.acecloudhosting.com/app/login"
-					},
-					{
-						"key": "Sec-Fetch-Dest",
-						"value": "empty"
-					},
-					{
-						"key": "Sec-Fetch-Mode",
-						"value": "cors"
-					},
-					{
-						"key": "Sec-Fetch-Site",
-						"value": "same-origin"
-					},
-					{
-						"key": "User-Agent",
-						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0"
-					},
-					{
-						"key": "sec-ch-ua",
-						"value": "\"Chromium\";v=\"142\", \"Microsoft Edge\";v=\"142\", \"Not_A Brand\";v=\"99\""
-					},
-					{
-						"key": "sec-ch-ua-mobile",
-						"value": "?0"
-					},
-					{
-						"key": "sec-ch-ua-platform",
-						"value": "\"Windows\""
-					},
-					{
-						"key": "Cookie",
-						"value": "useNewTheme=true; __stripe_mid=eeaac890-fbb5-4e56-a35c-5c8beeecff43bf1c4c; rtdsportal-_zldp=r9SKnJByViBJbpGGQCg4sMSc8cu7ArqNXMbd2wvb8g2DL8kTzFo7BlWZo8iWKZuBCM5f4TtJTsA%3D; rtdsportal-_zldt=2cd548cb-9cce-4992-841f-320b09cdb045-0; currentRegion=ap-south-noi-1; next-auth.csrf-token=f085b402fbbcd20cfb333beecb56f26a0ec9a0808060c811c016bdf0ee954930%7Ce8fd93ad8b8aa977b75402a73e8b2b7d7f2258ae214d6a8adba5d4676ae8a545; next-auth.callback-url=http%3A%2F%2Flocalhost%3A3000; colorPref=dark; WHMCSFR44VD4mpvF4=it5lk8l05gb3hdqthu7vfe030j; userremember=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0a3ZhbCI6ImNEVWdsYnhFYWhPVyIsInVpZCI6MjYyMCwibG9naW5fYXV0aF90ayI6IntcImlkXCI6Mjg4OSxcImVtYWlsXCI6XCJrYXJ0aWtqb3NoaXVrK2NsaWVudDNAZ21haWwuY29tXCIsXCJwYXNzd29yZFwiOlwiZTI1N2JmMjljMjc2OGIzYjhjZDZiNTZjZjZkNzYwNGE5ZWM0MjhlNDA5YTE3ZDlhY2U3YzQ2ZjYxZDU2YzI0NVwiLFwidXNlcmlwXCI6XCIxNS4yMDcuMjI1LjE0MVwiLFwidGltZXN0YW1wXCI6MTc2MzI5NTkxNCxcImhhc2hcIjpcIjQ1ZjcyNWZiNjdjMGJjN2U2MDNlOWZlNDZmOTExNGIxZjRiZWExZDk4YTJjMDY2OGJlYWI0MTc5MWRlYjQxZTVcIn0iLCJpc3MiOiJodHRwczpcL1wvY3VzdG9tZXIuYWNlY2xvdWRob3N0aW5nLmNvbSIsImF1ZCI6Imh0dHBzOlwvXC9jdXN0b21lci5hY2VjbG91ZGhvc3RpbmcuY29tIiwiaWF0IjoxNzYzMjk1OTE0LCJleHAiOjE3NjM1NTUxMTR9.6gERGW_J15NMWvN7y_2dF2hP764gUDXMfRXYsUaTklZSzynZ0L-C0CSnXr9rG4VVpWYhtqJadi_UzwvAwzutF5OXcaqmG6TIAiDH_SdJsdpViGL4LJCycYzmJgCgtrZbFg8P9eosYh29p9aETjgyL9gawtYEAmVB-55I6aymag4BqTqam_4x4ZyKtEJHoGX3vNqbk2BLG1AdncxBr5Vby2516FuZGmfJGO65hoEtBm8_ciqQQwRzTV4WMPm_xgreSvy7NVIaVeM1NsB0xOAVgaxm0dSoIP8wkluuu3nn6JRR1Pr42pvzKxkZ7pP7qMWnlwnY7tDYfQ4iUOhJ3V6OcA; isPrepaidClient=true"
-					}
-				],
+				"auth": {
+					"type": "inherit"
+				},
+				"method": "POST",
+				"header": [],
 				"body": {
-					"mode": "graphql",
-					"graphql": {
-						"query": "",
-						"variables": ""
+					"mode": "raw",
+					"raw": "{\n    \"fullname\":\"jatin\",\n    \"email\":\"godnanijatin@gmail.com\",\n    \"password\":\"hhhhhh\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
 					}
 				},
 				"url": {
-					"raw": "https://customer.acecloudhosting.com/api/v1/wallet",
-					"protocol": "https",
+					"raw": "http://localhost:8000/auth/signup",
+					"protocol": "http",
 					"host": [
-						"customer",
-						"acecloudhosting",
-						"com"
+						"localhost"
 					],
+					"port": "8000",
 					"path": [
-						"api",
-						"v1",
-						"wallet"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "User Status",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept-Language",
-						"value": "en-US,en;q=0.9,en-IN;q=0.8"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer ACCESS_TOKEN"
-					},
-					{
-						"key": "Connection",
-						"value": "keep-alive"
-					},
-					{
-						"key": "Referer",
-						"value": "https://customer.acecloudhosting.com/app/login"
-					},
-					{
-						"key": "Sec-Fetch-Dest",
-						"value": "empty"
-					},
-					{
-						"key": "Sec-Fetch-Mode",
-						"value": "cors"
-					},
-					{
-						"key": "Sec-Fetch-Site",
-						"value": "same-origin"
-					},
-					{
-						"key": "User-Agent",
-						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0"
-					},
-					{
-						"key": "sec-ch-ua",
-						"value": "\"Chromium\";v=\"142\", \"Microsoft Edge\";v=\"142\", \"Not_A Brand\";v=\"99\""
-					},
-					{
-						"key": "sec-ch-ua-mobile",
-						"value": "?0"
-					},
-					{
-						"key": "sec-ch-ua-platform",
-						"value": "\"Windows\""
-					},
-					{
-						"key": "Cookie",
-						"value": "useNewTheme=true; __stripe_mid=eeaac890-fbb5-4e56-a35c-5c8beeecff43bf1c4c; rtdsportal-_zldp=r9SKnJByViBJbpGGQCg4sMSc8cu7ArqNXMbd2wvb8g2DL8kTzFo7BlWZo8iWKZuBCM5f4TtJTsA%3D; rtdsportal-_zldt=2cd548cb-9cce-4992-841f-320b09cdb045-0; currentRegion=ap-south-noi-1; next-auth.csrf-token=f085b402fbbcd20cfb333beecb56f26a0ec9a0808060c811c016bdf0ee954930%7Ce8fd93ad8b8aa977b75402a73e8b2b7d7f2258ae214d6a8adba5d4676ae8a545; next-auth.callback-url=http%3A%2F%2Flocalhost%3A3000; colorPref=dark; WHMCSFR44VD4mpvF4=it5lk8l05gb3hdqthu7vfe030j; userremember=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0a3ZhbCI6ImNEVWdsYnhFYWhPVyIsInVpZCI6MjYyMCwibG9naW5fYXV0aF90ayI6IntcImlkXCI6Mjg4OSxcImVtYWlsXCI6XCJrYXJ0aWtqb3NoaXVrK2NsaWVudDNAZ21haWwuY29tXCIsXCJwYXNzd29yZFwiOlwiZTI1N2JmMjljMjc2OGIzYjhjZDZiNTZjZjZkNzYwNGE5ZWM0MjhlNDA5YTE3ZDlhY2U3YzQ2ZjYxZDU2YzI0NVwiLFwidXNlcmlwXCI6XCIxNS4yMDcuMjI1LjE0MVwiLFwidGltZXN0YW1wXCI6MTc2MzI5NTkxNCxcImhhc2hcIjpcIjQ1ZjcyNWZiNjdjMGJjN2U2MDNlOWZlNDZmOTExNGIxZjRiZWExZDk4YTJjMDY2OGJlYWI0MTc5MWRlYjQxZTVcIn0iLCJpc3MiOiJodHRwczpcL1wvY3VzdG9tZXIuYWNlY2xvdWRob3N0aW5nLmNvbSIsImF1ZCI6Imh0dHBzOlwvXC9jdXN0b21lci5hY2VjbG91ZGhvc3RpbmcuY29tIiwiaWF0IjoxNzYzMjk1OTE0LCJleHAiOjE3NjM1NTUxMTR9.6gERGW_J15NMWvN7y_2dF2hP764gUDXMfRXYsUaTklZSzynZ0L-C0CSnXr9rG4VVpWYhtqJadi_UzwvAwzutF5OXcaqmG6TIAiDH_SdJsdpViGL4LJCycYzmJgCgtrZbFg8P9eosYh29p9aETjgyL9gawtYEAmVB-55I6aymag4BqTqam_4x4ZyKtEJHoGX3vNqbk2BLG1AdncxBr5Vby2516FuZGmfJGO65hoEtBm8_ciqQQwRzTV4WMPm_xgreSvy7NVIaVeM1NsB0xOAVgaxm0dSoIP8wkluuu3nn6JRR1Pr42pvzKxkZ7pP7qMWnlwnY7tDYfQ4iUOhJ3V6OcA; isPrepaidClient=true"
-					}
-				],
-				"url": {
-					"raw": "https://customer.acecloudhosting.com/api/v1/auth/user-status",
-					"protocol": "https",
-					"host": [
-						"customer",
-						"acecloudhosting",
-						"com"
-					],
-					"path": [
-						"api",
-						"v1",
 						"auth",
-						"user-status"
+						"signup"
+					]
+				},
+				"description": "hii this is something you should noticed? lets go bro\n"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/data",
+			"request": {
+				"auth": {
+					"type": "inherit"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"godnanijatin@gmail.com\",\n    \"password\":\"hhhhhh\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/auth/signin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"auth",
+						"signin"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Allowed Projects",
+			"name": "New Request",
 			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept-Language",
-						"value": "en-US,en;q=0.9,en-IN;q=0.8"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer ACCESS_TOKEN"
-					},
-					{
-						"key": "Connection",
-						"value": "keep-alive"
-					},
-					{
-						"key": "Referer",
-						"value": "https://customer.acecloudhosting.com/v1/en/instances?region=ap-south-noi-1&timezone=Asia%2FCalcutta&id=2272&project_id=6912690968ce46cb8ac7b4a96e91beee"
-					},
-					{
-						"key": "Sec-Fetch-Dest",
-						"value": "empty"
-					},
-					{
-						"key": "Sec-Fetch-Mode",
-						"value": "cors"
-					},
-					{
-						"key": "Sec-Fetch-Site",
-						"value": "same-origin"
-					},
-					{
-						"key": "User-Agent",
-						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0"
-					},
-					{
-						"key": "baggage",
-						"value": "sentry-environment=production,sentry-public_key=e1f46d92a21e98c8d6da449b8633f575,sentry-trace_id=25bea0419c4840809f08ea3eb4f6c5be,sentry-org_id=4506139955953664,sentry-replay_id=df9719c96b474960a7055b55c263efdd,sentry-transaction=%2F%3Alang%2F%3Anot-found*,sentry-sampled=false,sentry-sample_rand=0.5644412630395925,sentry-sample_rate=0.1"
-					},
-					{
-						"key": "sec-ch-ua",
-						"value": "\"Chromium\";v=\"142\", \"Microsoft Edge\";v=\"142\", \"Not_A Brand\";v=\"99\""
-					},
-					{
-						"key": "sec-ch-ua-mobile",
-						"value": "?0"
-					},
-					{
-						"key": "sec-ch-ua-platform",
-						"value": "\"Windows\""
-					},
-					{
-						"key": "sentry-trace",
-						"value": "25bea0419c4840809f08ea3eb4f6c5be-9349fc0e7c41d8d3-0"
-					},
-					{
-						"key": "Cookie",
-						"value": "useNewTheme=true; __stripe_mid=eeaac890-fbb5-4e56-a35c-5c8beeecff43bf1c4c; rtdsportal-_zldp=r9SKnJByViBJbpGGQCg4sMSc8cu7ArqNXMbd2wvb8g2DL8kTzFo7BlWZo8iWKZuBCM5f4TtJTsA%3D; rtdsportal-_zldt=2cd548cb-9cce-4992-841f-320b09cdb045-0; currentRegion=ap-south-noi-1; next-auth.csrf-token=f085b402fbbcd20cfb333beecb56f26a0ec9a0808060c811c016bdf0ee954930%7Ce8fd93ad8b8aa977b75402a73e8b2b7d7f2258ae214d6a8adba5d4676ae8a545; next-auth.callback-url=http%3A%2F%2Flocalhost%3A3000; colorPref=dark; WHMCSFR44VD4mpvF4=it5lk8l05gb3hdqthu7vfe030j; userremember=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0a3ZhbCI6ImNEVWdsYnhFYWhPVyIsInVpZCI6MjYyMCwibG9naW5fYXV0aF90ayI6IntcImlkXCI6Mjg4OSxcImVtYWlsXCI6XCJrYXJ0aWtqb3NoaXVrK2NsaWVudDNAZ21haWwuY29tXCIsXCJwYXNzd29yZFwiOlwiZTI1N2JmMjljMjc2OGIzYjhjZDZiNTZjZjZkNzYwNGE5ZWM0MjhlNDA5YTE3ZDlhY2U3YzQ2ZjYxZDU2YzI0NVwiLFwidXNlcmlwXCI6XCIxNS4yMDcuMjI1LjE0MVwiLFwidGltZXN0YW1wXCI6MTc2MzI5NTkxNCxcImhhc2hcIjpcIjQ1ZjcyNWZiNjdjMGJjN2U2MDNlOWZlNDZmOTExNGIxZjRiZWExZDk4YTJjMDY2OGJlYWI0MTc5MWRlYjQxZTVcIn0iLCJpc3MiOiJodHRwczpcL1wvY3VzdG9tZXIuYWNlY2xvdWRob3N0aW5nLmNvbSIsImF1ZCI6Imh0dHBzOlwvXC9jdXN0b21lci5hY2VjbG91ZGhvc3RpbmcuY29tIiwiaWF0IjoxNzYzMjk1OTE0LCJleHAiOjE3NjM1NTUxMTR9.6gERGW_J15NMWvN7y_2dF2hP764gUDXMfRXYsUaTklZSzynZ0L-C0CSnXr9rG4VVpWYhtqJadi_UzwvAwzutF5OXcaqmG6TIAiDH_SdJsdpViGL4LJCycYzmJgCgtrZbFg8P9eosYh29p9aETjgyL9gawtYEAmVB-55I6aymag4BqTqam_4x4ZyKtEJHoGX3vNqbk2BLG1AdncxBr5Vby2516FuZGmfJGO65hoEtBm8_ciqQQwRzTV4WMPm_xgreSvy7NVIaVeM1NsB0xOAVgaxm0dSoIP8wkluuu3nn6JRR1Pr42pvzKxkZ7pP7qMWnlwnY7tDYfQ4iUOhJ3V6OcA; isPrepaidClient=true; next-auth.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..3UWNo0MIGHEiM8H2.Ms1y0R_P7n0yMDa-3fK44fZpVjfn4xNYG8vnx2-Mvkc1QyU2XL_SV4n7JxWMT-0P-zSD2ZUwHnWxGYOjWb8feU5s65XfwpSy8O_rvACLbS125SlElEIbnJB7oKCVBP1GdvM2zfOPipXodXf_S-w14T49g1s2Yw-t9RuKevNpqND_Nv8d-l8qqFXKDeWb197N824bpx_7bWvAZhXrI709loB4Tmh4tAudyAx9-ZE_VWMz-BYE2UGeVL0oBo8LpAJRbGYrtD73B-bVxUjLg9KW0pz1rw2wEXU6SHqIyjprlMv2FM21pjPkj9QtLOkGyWUNoszwmgQ4FcMox_jACmvqPVJCED1U-qzioivSpzEl3xXPSgls9LY88J3CIf9840nmGXJ1t_UnTPorw1LhrbfNtglhTeY6AU8aff2dq1EuSYQRZXJ9CqJWIWg91MuPSmhSBUKB6ZWK3OzMFvE6HFww7sJo177B9y7A0hj9Xnhm5oDfuL7dWZD5Mi9P_7xM2oUgkonzvfWNvOEjI2UA9FIX5w4TWisa_kHNHqTJ4nq0m8wgvXQwBcVIoiO2haM96Q-XIVsTWln3w17-mtZUzMgKzwvPhQw4KkuDuzW0piL62_pvfeWPg4LDZJsjzD8y4os1IJTj9gahsN0eEfwmJByHPCJ1H-peecWs-wdsD7jCGxhFN509xKPFAeCrwB85ATTqckI3tXXcRf6rCz1zPqMqWYGWTmfrqGQHqxiS8yaEg8x3DtSj2b8RdyUc2fUiRfxkasUhupzenAyi7oHkLSoSlRelfWEGT_N8PDwtvrPHmi8e9EvFEqujeLB8npx8ppLrPUtIXIJF8ygnritJOeZ-RxwRpuc6IbyFwvndmCHrIMX2okTuy0nhaMimLV9PFabuUdJnRXEWg4f4lDnLhvqXLz3bZdK1Z-h5Grcxg-5sU6jl-ZFeX9VZSv65m3xwmBPmnf3DUoUUBFMc6EEEA2-1NceVYZy1DqO-FmkTTSUvYvLtarGh3IOITMospfQH5IRP-2JDO7IZ5oEOakj3hp6EmIrkPP_BbsrfGP9h8MG0rD5zLCezkygTZDho1fYyexjzHIIc5-xhWl_hKI1UN1V2ag3syKhdzsYEUmq0esWhNI-ytYPfJu5VVEelATOtCpYGsLQUSjeVej8_oWh36QF5gXD4Dt47rHG7XESZ7duML7CorbKeIsqZdIz1Qq8KAThrCnZk8ohMgfLpPmwCpi55uIl747UDBo48tbSLyHJ-sdYsp3BXYosP9Iz32pJpACfpTIKrfp1oqwF6do0CJdGz1L0QsQ6YgjRvz8R7P3BJ13bm-Gl_HoBW5e6jps_1qw31UCeHAoLqJ1NuVl842gw0ffGdLh1QXLOXQRcU0Y7Xi4ZXWqCEYc2xOTZKX97nU_VuG9rFk-f6Mxkgm2d5GZaUNziJf66jSD4V2FNrMg7WRkXr0YONFiJhtvUE0b1gscvFKplFGhqlVYui19ZaSSN8XX51lwZmxTSowC1DQ7r_AW6qLByjLicnk6fm80H9-UkHF-kclBGCD9sCrzUZR1gFvKpMfLtP66W_FyrDG7pB1TqImnsgcYigXxOWkpM87ElMRNg4MHBForFql5hGHlFZrvTuszNvpl-2qRo6iXYYnmGtxiv1gBtuluYa18PZNflSnyVwVf3VckkJd-b0Bvhipv0Plc2oDa_0maAiJXVex4BgjXnDTqI2UBxeeEqONaTC7wkKyZ42yPexRdCsoG5xfI6WTf-RBLKycJYIzHmD1q56Bx5QCcEKDS95U6cd8Nb97vGTCZtkjXemNwR8gMRBAn7OMgTs-61e5iEHitDuJQSaEgnjsQsMPc3az6i3gtqzZjEQ31JXkIu7LdMOBdFmSiI_4Q6lGQYRl72n89S8NBIS7N3w0wY4kiq8k39hVbgEY04JI9lOX4U6mxoQsQSeU2VHXYU5Ic_wbeqnOZ8HBDhZzDXovZcSUJRxzdFnc6hYjOKeV_b5j9ZDxJFSP2esIibZlVZbdxz0MGdQjAgn-dBO3c8hzN9i8QrmxemEiH3AQKfqp2loBm_FC5MY6OOsCuNH-uaklYqXXfgEac51mZ6wPz_QxfvmmEcYpyRVZCFqQ-PRBNCRApiOBfoHJCXjttN8dVu_g3j55d6dvVmyIx9z92yVYeJOUV6q4FfniQB9TWboOE_ezRXDKQ7aaKpBud1w2KFhlx9fz8KglSjZoIlqUIiEPfdH94VDeRIfwTO220EQcsmFVHOijFOD8Nw3GSgbqeI1UzDGkRrIPmPqVmzrDzLc6wV9JdZilg0LlkzQO4BhxTtDPSEOUoupktFQhhUSMDPpwTJikSWK-4IWYp2EbxuuT7cLJKgNvs_uyfO7vkfSabMIdYINSzFL9S9ru8KXAaVV2rPqCzPZhXI88kf9EyHCUhAiSfwaMXNKENkCK6uJHjxYUoxrAFtH0Is4XXijb2NPBjtMOFooi4NTbeqfMQFXhIu11uFAWxVuKnqHcz7xVI4vgDeEX-RAmSSNtDh8xj9xSHLZ-FoR8t4iu6t7HwRNiPkx5OPRbgjodMrifvgSh5gXSkapln_FVuVUbJhF3nl144RzP1fAF3_33dyOPK3ngHr92P3hvAXbU9_gj-K6b2sYqtJclojj45LzYqcdgHM4UmNq_ZjXbTl3ZHslwoki9V91EjazhcuJKhp1p3lcgrTd7gclaZRvhpHF6whKj7DFowbpTKQkpJJAkdIjzQfF7t4hukuldewbUX1pZIgfDhkstc0qrJTtu_pWigIt1zfBGFVs_bxKhrh_RdCEXyVFXR65OSbR0DW3mvcleFVwla5DOk6_DXiGtoWLCnFB4NJBfk04NwXEC0S38OWhZXOZSTH8WMEfjMQ18aQ3d6LDf6obQePR439U35Wf3Q-xG6k7pJn2aQd6n_6mI8Cw3cXY84BCjJsceeTmDclaiKrQYWJ9i9dKeH4WhJbKR91NKV2v3XfP9oi8FnHZ0XjJ7UEuyiK75XcvvmewbhZQtH06dn4pyBIaQNqocDq5LpgISFPARkl8JaxseYT5TlXd7DlvMlsAOINyd0zfnKuS6Nt2QAIVOLQK-TEouzZ3sh08e3lbj2pGMbSDdwxwt7kpGgM79GwArkSCG3ZddaxIzh8HDED1n5p9pYvm4vH97V-LW1g2KsivzfjX0N9TqaRXumhjdHee3Dfm6Q4DaVdmV1tZxur_IyTGWbQzNtV4NvpREpg-mGqcLyepRmEYhnHj5_giNp8Q8-5i0yTq6amcdarabe6V7Vd96icXP_ALhp_NbMXIaQQbEUnmjUpWjZci9pyFCWgcz44C6QSK2LwdcjbxZuBFoFC-TkMvHzLlnPTd_4Zl8_Nv5TQEl2k-zCGdqQ6lwG2idzvXMo3w7Bp4R-Hh8h252lqFdPx17PKT9vUalA64NgC7AimDa_ISNukV_icrljFaGQuL2A.e7Vgm8CyKNF4Uo9ChfZMgg"
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YTRmYzIyZTkwYWNiZWRmYzQwZDBkZCIsImVtYWlsIjoiZ29kbmFuaWphdGluQGdtYWlsLmNvbSIsIm5hbWUiOiJqYXRpbiIsImlhdCI6MTcyMjE0NjU3Mn0.p3kklQVXwBtdxm-O3HGP69KoLBr77weR1TXPXi_7Oh4",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"jatin\",\r\n    \"description\":\"in 13th class\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
 					}
-				],
+				},
 				"url": {
-					"raw": "https://customer.acecloudhosting.com/api/v1/projects/allowed-projects",
-					"protocol": "https",
+					"raw": "http://localhost:8000/taskhive/workspaces",
+					"protocol": "http",
 					"host": [
-						"customer",
-						"acecloudhosting",
-						"com"
+						"localhost"
 					],
+					"port": "8000",
 					"path": [
-						"api",
-						"v1",
-						"projects",
-						"allowed-projects"
+						"taskhive",
+						"workspaces"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "Wallet Details",
+			"name": "New Request",
 			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2YTY4NTA4OGVhYjliZTE0MzNlMjY1MSIsImVtYWlsIjoiZ29kbmFuaWphdGluMjNAZ21haWwuY29tIiwibmFtZSI6ImphdGluIiwiaWF0IjoxNzIyMTg5MDkzfQ.RP8cCByvwynzVztqJ6LUsBMydNJA6BOwUdcl1AcEzwM",
+							"type": "string"
+						}
+					]
+				},
 				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					},
-					{
-						"key": "Accept-Language",
-						"value": "en-US,en;q=0.9,en-IN;q=0.8"
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer ACCESS_TOKEN"
-					},
-					{
-						"key": "Connection",
-						"value": "keep-alive"
-					},
-					{
-						"key": "Referer",
-						"value": "https://customer.acecloudhosting.com/v1/en/instances?region=ap-south-noi-1&timezone=Asia%2FCalcutta&id=2272&project_id=6912690968ce46cb8ac7b4a96e91beee"
-					},
-					{
-						"key": "Sec-Fetch-Dest",
-						"value": "empty"
-					},
-					{
-						"key": "Sec-Fetch-Mode",
-						"value": "cors"
-					},
-					{
-						"key": "Sec-Fetch-Site",
-						"value": "same-origin"
-					},
-					{
-						"key": "User-Agent",
-						"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0"
-					},
-					{
-						"key": "baggage",
-						"value": "sentry-environment=production,sentry-public_key=e1f46d92a21e98c8d6da449b8633f575,sentry-trace_id=25bea0419c4840809f08ea3eb4f6c5be,sentry-org_id=4506139955953664,sentry-replay_id=df9719c96b474960a7055b55c263efdd,sentry-transaction=%2F%3Alang%2F%3Anot-found*,sentry-sampled=false,sentry-sample_rand=0.5644412630395925,sentry-sample_rate=0.1"
-					},
-					{
-						"key": "sec-ch-ua",
-						"value": "\"Chromium\";v=\"142\", \"Microsoft Edge\";v=\"142\", \"Not_A Brand\";v=\"99\""
-					},
-					{
-						"key": "sec-ch-ua-mobile",
-						"value": "?0"
-					},
-					{
-						"key": "sec-ch-ua-platform",
-						"value": "\"Windows\""
-					},
-					{
-						"key": "sentry-trace",
-						"value": "25bea0419c4840809f08ea3eb4f6c5be-b27134c2039641cb-0"
-					},
-					{
-						"key": "Cookie",
-						"value": "useNewTheme=true; __stripe_mid=eeaac890-fbb5-4e56-a35c-5c8beeecff43bf1c4c; rtdsportal-_zldp=r9SKnJByViBJbpGGQCg4sMSc8cu7ArqNXMbd2wvb8g2DL8kTzFo7BlWZo8iWKZuBCM5f4TtJTsA%3D; rtdsportal-_zldt=2cd548cb-9cce-4992-841f-320b09cdb045-0; currentRegion=ap-south-noi-1; next-auth.csrf-token=f085b402fbbcd20cfb333beecb56f26a0ec9a0808060c811c016bdf0ee954930%7Ce8fd93ad8b8aa977b75402a73e8b2b7d7f2258ae214d6a8adba5d4676ae8a545; next-auth.callback-url=http%3A%2F%2Flocalhost%3A3000; colorPref=dark; WHMCSFR44VD4mpvF4=it5lk8l05gb3hdqthu7vfe030j; userremember=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0a3ZhbCI6ImNEVWdsYnhFYWhPVyIsInVpZCI6MjYyMCwibG9naW5fYXV0aF90ayI6IntcImlkXCI6Mjg4OSxcImVtYWlsXCI6XCJrYXJ0aWtqb3NoaXVrK2NsaWVudDNAZ21haWwuY29tXCIsXCJwYXNzd29yZFwiOlwiZTI1N2JmMjljMjc2OGIzYjhjZDZiNTZjZjZkNzYwNGE5ZWM0MjhlNDA5YTE3ZDlhY2U3YzQ2ZjYxZDU2YzI0NVwiLFwidXNlcmlwXCI6XCIxNS4yMDcuMjI1LjE0MVwiLFwidGltZXN0YW1wXCI6MTc2MzI5NTkxNCxcImhhc2hcIjpcIjQ1ZjcyNWZiNjdjMGJjN2U2MDNlOWZlNDZmOTExNGIxZjRiZWExZDk4YTJjMDY2OGJlYWI0MTc5MWRlYjQxZTVcIn0iLCJpc3MiOiJodHRwczpcL1wvY3VzdG9tZXIuYWNlY2xvdWRob3N0aW5nLmNvbSIsImF1ZCI6Imh0dHBzOlwvXC9jdXN0b21lci5hY2VjbG91ZGhvc3RpbmcuY29tIiwiaWF0IjoxNzYzMjk1OTE0LCJleHAiOjE3NjM1NTUxMTR9.6gERGW_J15NMWvN7y_2dF2hP764gUDXMfRXYsUaTklZSzynZ0L-C0CSnXr9rG4VVpWYhtqJadi_UzwvAwzutF5OXcaqmG6TIAiDH_SdJsdpViGL4LJCycYzmJgCgtrZbFg8P9eosYh29p9aETjgyL9gawtYEAmVB-55I6aymag4BqTqam_4x4ZyKtEJHoGX3vNqbk2BLG1AdncxBr5Vby2516FuZGmfJGO65hoEtBm8_ciqQQwRzTV4WMPm_xgreSvy7NVIaVeM1NsB0xOAVgaxm0dSoIP8wkluuu3nn6JRR1Pr42pvzKxkZ7pP7qMWnlwnY7tDYfQ4iUOhJ3V6OcA; isPrepaidClient=true; next-auth.session-token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..IcGgUu1E1TvwDO3G.SSzxbZJs6IH2hRXsiXA0S3gI8tuckka6pI8WqO9ZP9_hrc_ipusWn1nYOsKuBIns5O4rIf3S40sFKUdCHwwdLilbVbVWeg5nR8_SLZ6EDrEGBIeCFv668OC5Ym40f01IkjebsEhgjPxP84HUunpAi_dH72WcrTIrE1lB2OW6Xa0oH20_P-zbS2brbMyrAHnf3KB-YPZxS662v9Af7RNFeLNukZjItLn0JL8qaCV5EcmoFICK3Iy_Sa_UZ-krUntKeQ-Q2KBwPc1mOSKM67K90kBbcHpiOokdg1NIw-_Gra3IavY_4JgOiZS1ZJsDY7KexqMaewfMvvKeiZcbu-FvBDnQS-wW1hvCCJ8QjZFJwHR9xsSpz3u3BHOsBfEBGMPUZxvCB_Qas-9jUYYKcK7d9UqAtn5r4W2C3j-TuOldZ7wpE9eouDLrcd1SofHVlkh8M6tIpgx8Bynr_JLeFhF-2h2h2CO-NQeaDbwHFgszDxfc4Qn8YDIgyxrmjR3b4GH3o3e1zINJ43BxcfwZMG2yi85MBJw5FqaDZqj3gFtGyrbg1dFV6AdZi1mwMcC4nOOUVJybfh69f-9HR36SMiFewm7xSf0jdjqPoNxeMcjRTbQI5Qi1B5MyJt52xdfTIwsy4qfn0KVwKoNkIf5dJnqg_txIZmmj0H-9-jiWDSddf3_N_na9udjb0LmMmZrYqAi1E7qb2dvy2TY7GsbgZUzNqfe7vpr5gpfcd1zBtrfXHndEVhLs8sEv4YHWHo_xNeHrLrgzlZPKTthnpHX8MkTpsjES8mI35dU6yWpLcpS1e6JEuSIWXr2W93WezbgqYPjN_RLlEeyS8iZq2l_rJuS_FR_IphW0yR43tI7nsSHbFJYEs6LnemfHrXmapAnQWVfNmh9NrgsNTm3YKnSRWQQGzM5l2CFhKXV189CJksEMA3afzoYQRicMf4gW3tVEOu99sWB0yMUylcy1tP4FyGY64Ahet_3oHweYH7-Ggyby1cjZKpBHARCFc6bypM5PuGVottsjmYoJ1GgM2haEb1lV_UV68Xk5Hd8qmqRILsomo7I0-NclmSxSfIGl50EpeHPcc69OWbFWQ1fDR0iBXtTtAsoKRr7DSoVfNoHrAsVeFHmfZnJzTbXwJ8hSKJ2YkMCg-DFzQfTrcWyicedXBSt827QVUW6e1a_6gmRZPUbdIMXO_k2JHaoN_wwPqfDS3QAt6hbeR2YhX3jjrfhemm_GlKUvvHAUR11DGZ8PhfTtRsNdumHPB1TvLdE28QWakg_Mn_nEo3fybS2-FmUcOPCl7RRcMeYtBKpRN0q0q4GE5Cz7ugS3G_t3-jXOH-gZZerPQgYnJWe1F_FAH_XpvknJGFBZLRGAYpfHZ7HE9z-tHGZD4fos71V8L_KEAa5BZGp3mVWMjSfAaVwA2HJSnRB_3qEc4necWYm6Ou9SJjxebYI3Xd2Xud98P0e0n8JnWfsTdR2s26qPCpUD8oHZVgsWTTkBy2QBDXZEWUmOSVCs7wra_gcAym97R3n3AW0PZAlvVPIWMeo6PmH2NEnmh9L-AT04pDdDgGCz_n9_B7jUZkmTYkvVR_Jo4R2thF9SeOMdSTSzqoDtj9z0wwCuXRJuUDjXl7tI7dqhh_iDYMjk-o5i2N7Oub8VevY5vGGex3EJuVa_iUJEEDxQG3ZJDgmzJlkE_W_DVw-yLo8KzM3n5DTJmZn2WsRwlJFrlA16qnJMS1QhDVWkwfjxrWPTOzwNyOmLAua8zj0RJycbNw0I1C9mGDGGFjq_QMA49iRENE_-dTdQuueWpAMBx_HbcA8bcI1wIpG7feB91ch8zpEk0nqCbNxzSgm_Jb_4PmyF5_vIzdS1pxXVnrJdY6U6RT4E6ZUrSl9JhRz_Ihbw8GhUDuEw-wrOURUUd1jVWRJWsidnsqxSDAXW_X3Q9zIJBT7fMgWNLihUaeWzzwy00h7QqIsUQbJxQLCMGYOHcRUVo4ecqPduPsBLY5utCYNmAspgWzvM0xjBqYoz3bzaOWWAZV1PAZ1MiFCJWOrJ9qbRCPyJTRCVWTgynqmAE2OVtA_KCkTEFFLpdagXrn_OrgzCdWAMy6HprWeQges-oiiijTTowflP78Oj28peb-6qzuZq5bKCpocnOwEayx9roc3zwuI0qEiqtPDAhoj-ho8sV_vvPNMNt5jU2j3Vvkosew7gsvsFJ1beNnLbIZiCo6YNiGim029g-pBgHk2Dw6zXj9acU0QLbSnxFZJZDPcF5s2rooqRK3tAR9C_nUWL8Z425mWIZhd8AZvyzBPzLuyXaXeCRBXjpAoVVPLBTQ2DiNegRn6U-0sRAbCT8WAFLpbmDjpmcz0rV4kCR0PQPDU0Fi4OO-0OTRRfcPiDCPG4hD4d31j5wVtOZHPHFs2im3e29ZhSEvEsylMUVlxj4PN4kwbMsvMtfo-E_nxKKSj1548X2EXggIUYAexnvBKdgS75vP8H9Byw7x_uh0NM3GFrq1nXmXP3e5yKEhw4Nq3TZTcYAtf63veTpr2S6BQakSqM9Up0xqID4b8YpiecAWn8kmqFt2EscvosbZqGeQVUT3nSlyN2cTBq8eqFrZFcSpUQeyMaMbSlZ9mXrcT9Tq8a8UuTG1qgs8VYSqhD_rsAFHJ8q_EZOM4FVqMTx31jccnqSjXBzlzCnOcl6kqtZrgVNDdhVQotmxMznllvnbzr3wHbwnjeccPDsS4kCZacP2T98LSG1qgm6Xowna4vmEZ_kjZ3rYG5r5CKBzz6KcG4JSbli6wAB-sPEHE06F0rUqqLf0xfDJR3VyS0X0J88fI7UYnnG-Q7TBivglr5LKQJ2J65k9Z8kR1MviqHUhU8dXyx2BLHgCv7wyv0yUuyNOZCZW_NGwawJ5d6hcrayKpItpzb9AgGA0shq-F0EQenZQat2ZKYOECvGSYKWLTKOCvkQjRA_CD6CT0mwjRn5-ZxYTiMsnXQ9sGPi39GPoyY2UZCjJZBDNqib13wtlf-BuqqDr7uoxPNHxWysq0tQfiLh7p6ooVkGRyT2YDsGqwYbUpesO3qGjoiVDG2fVrQbRaRstKc9EAPwoKwEtyKKxjifpP81xovLVYKZpa5U7rerMR-jmQ2z8UgHBq8b4xaLeB8Y7QxkKXUN2WyZeYf4S4l1Z7rciREc7jHLCHtYga-S3ltSeeEiXO8pseMXqFvP_cT3ToB-7gDhkvfSgaNiiy_UWMslSu7bTLj9tCBLTBQaDTkedd8sGHxIHAuVSlykBfqNgN7ZHEIsw2OufE7YlkxSxA7d7dAdoL1GcdtnaHjsWuMuINSr4OmD0-utshQSy06PQ5PMYrTaC70yyOM2tljl_bNqK9UYBvigbaOQCCjR91INomSPs7KFmqK6ObJf_8a1hwddLbvcPwRHF6IP58tuTxhRpDtqoo-rOMdhaYqoJMeOqALUewQtLcF_FTYZg._IvnfeX98i-KGqgvsD8NWg"
-					}
-				],
+				"header": [],
 				"url": {
-					"raw": "https://customer.acecloudhosting.com/api/v1/billing/info",
-					"protocol": "https",
+					"raw": "http://localhost:8000/taskhive/workspaces/:workspaceId/tasks",
+					"protocol": "http",
 					"host": [
-						"customer",
-						"acecloudhosting",
-						"com"
+						"localhost"
 					],
+					"port": "8000",
 					"path": [
-						"api",
-						"v1",
-						"billing",
-						"info"
+						"taskhive",
+						"workspaces",
+						":workspaceId",
+						"tasks"
+					],
+					"variable": [
+						{
+							"key": "workspaceId",
+							"value": "66a6839a8eab9be1433e264d"
+						}
 					]
 				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
 			},
 			"response": []
 		}

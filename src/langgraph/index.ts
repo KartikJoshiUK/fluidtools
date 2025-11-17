@@ -10,19 +10,23 @@ import { DEFAULT_SYSTEM_INSTRUCTIONS } from "./constants.js";
 class FluidTools {
   private model;
   private agent;
+  private maxToolCalls: number;
 
   constructor(
     config: ProviderConfig,
     tools: Record<string, any>,
-    systemInstructions: string = DEFAULT_SYSTEM_INSTRUCTIONS
+    systemInstructions: string = DEFAULT_SYSTEM_INSTRUCTIONS,
+    maxToolCalls: number = 10
   ) {
     this.model = createProvider(config);
     this.agent = getAgent(this.model, tools, systemInstructions);
+    this.maxToolCalls = maxToolCalls;
   }
 
   public async query(query: string) {
     const result = await this.agent.invoke({
       messages: [new HumanMessage(query)],
+      maxToolCalls: this.maxToolCalls,
     });
 
     return result;
