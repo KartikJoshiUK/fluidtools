@@ -44,12 +44,7 @@ const getAgent = (
   }
   async function shouldContinue(state: z.infer<typeof MessagesState>) {
     const lastMessage = state.messages.at(-1);
-    if (
-      lastMessage == null ||
-      !AIMessage.isInstance(lastMessage) ||
-      (state.llmCalls ?? 0) >= 5
-    )
-      return END;
+    if (lastMessage == null || !AIMessage.isInstance(lastMessage)) return END;
 
     // If the LLM makes a tool call, then perform an action
     if (lastMessage.tool_calls?.length) {
