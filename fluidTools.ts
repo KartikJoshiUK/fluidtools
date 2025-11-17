@@ -1,21 +1,25 @@
-import { z } from 'zod';
-import { tool } from 'langchain';
 import axios from 'axios';
 
 // Generated LangChain tools from Postman collection
 
-export function generateTools(authToken?: string) {
-  const tools = [];
+export function generateTools(tool: any, z: any, authToken?: string) {
+  const tools: Record<string, any> = {};
 
   // List Key Pairs
   const list_key_pairs = tool(
     async (args: any) => {
       try {
-        const res = await axios.get('https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee', {
+        let url = 'https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee';
+        const params = new URLSearchParams();
+        if (args.region) params.append('region', args.region);
+        if (args.project_id) params.append('project_id', args.project_id);
+        if (params.toString()) url += (url.includes('?') ? '&' : '?') + params.toString();
+        const res = await axios.get(url, {
           headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
         });
         return JSON.stringify(res.data, null, 2);
       } catch (err: any) {
+        console.log("🚨 API ERROR");
         return `Error: ${err.message}`;
       }
     },
@@ -23,11 +27,12 @@ export function generateTools(authToken?: string) {
       name: 'list_key_pairs',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee',
       schema: z.object({
-        query: z.string(),
+        region: z.string().optional().describe('region parameter'),
+        project_id: z.string().optional().describe('project_id parameter'),
       }),
     }
   );
-  tools.push(list_key_pairs);
+  tools["list_key_pairs"] = (list_key_pairs);
 
   // Create Key Pair
   const create_key_pair = tool(
@@ -38,6 +43,7 @@ export function generateTools(authToken?: string) {
         });
         return JSON.stringify(res.data, null, 2);
       } catch (err: any) {
+        console.log("🚨 API ERROR");
         return `Error: ${err.message}`;
       }
     },
@@ -45,11 +51,11 @@ export function generateTools(authToken?: string) {
       name: 'create_key_pair',
       description: 'POST request to https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee',
       schema: z.object({
-        body: z.any(),
+        body: z.any().optional(),
       }),
     }
   );
-  tools.push(create_key_pair);
+  tools["create_key_pair"] = (create_key_pair);
 
   // Wallet Status
   const wallet_status = tool(
@@ -60,6 +66,7 @@ export function generateTools(authToken?: string) {
         });
         return JSON.stringify(res.data, null, 2);
       } catch (err: any) {
+        console.log("🚨 API ERROR");
         return `Error: ${err.message}`;
       }
     },
@@ -67,11 +74,11 @@ export function generateTools(authToken?: string) {
       name: 'wallet_status',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/wallet',
       schema: z.object({
-        query: z.string(),
+        query: z.string().optional(),
       }),
     }
   );
-  tools.push(wallet_status);
+  tools["wallet_status"] = (wallet_status);
 
   // User Status
   const user_status = tool(
@@ -82,6 +89,7 @@ export function generateTools(authToken?: string) {
         });
         return JSON.stringify(res.data, null, 2);
       } catch (err: any) {
+        console.log("🚨 API ERROR");
         return `Error: ${err.message}`;
       }
     },
@@ -89,11 +97,11 @@ export function generateTools(authToken?: string) {
       name: 'user_status',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/auth/user-status',
       schema: z.object({
-        query: z.string(),
+        query: z.string().optional(),
       }),
     }
   );
-  tools.push(user_status);
+  tools["user_status"] = (user_status);
 
   // Allowed Projects
   const allowed_projects = tool(
@@ -104,6 +112,7 @@ export function generateTools(authToken?: string) {
         });
         return JSON.stringify(res.data, null, 2);
       } catch (err: any) {
+        console.log("🚨 API ERROR");
         return `Error: ${err.message}`;
       }
     },
@@ -111,11 +120,11 @@ export function generateTools(authToken?: string) {
       name: 'allowed_projects',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/projects/allowed-projects',
       schema: z.object({
-        query: z.string(),
+        query: z.string().optional(),
       }),
     }
   );
-  tools.push(allowed_projects);
+  tools["allowed_projects"] = (allowed_projects);
 
   // Wallet Details
   const wallet_details = tool(
@@ -126,6 +135,7 @@ export function generateTools(authToken?: string) {
         });
         return JSON.stringify(res.data, null, 2);
       } catch (err: any) {
+        console.log("🚨 API ERROR");
         return `Error: ${err.message}`;
       }
     },
@@ -133,11 +143,11 @@ export function generateTools(authToken?: string) {
       name: 'wallet_details',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/billing/info',
       schema: z.object({
-        query: z.string(),
+        query: z.string().optional(),
       }),
     }
   );
-  tools.push(wallet_details);
+  tools["wallet_details"] = (wallet_details);
 
   return tools;
 }
