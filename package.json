@@ -1,6 +1,6 @@
 {
   "name": "fluidtools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered API multi tool agent with multi-provider support (OpenAI, Anthropic, Ollama)",
   "homepage": "https://github.com/KartikJoshiUK/fluidtools#readme",
   "bugs": {
@@ -18,11 +18,8 @@
   "exports": {
     ".": {
       "import": "./dist/src/index.js",
+      "require": "./dist/src/index.js",
       "types": "./dist/src/index.d.ts"
-    },
-    "./providers": {
-      "import": "./dist/src/providers/factory.js",
-      "types": "./dist/src/providers/factory.d.ts"
     }
   },
   "files": [
@@ -42,6 +39,7 @@
   "scripts": {
     "build": "tsc",
     "start": "npm run build && node dist/index.js",
+    "dev": "npm run build && node dist/src/langgraph/index.js",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

@@ -2,7 +2,7 @@
 // CLI tool to convert Postman collections to LangChain tools
 
 import fs from 'fs';
-import { postmanToLangChainCode } from './postman-to-tools.js';
+import { postmanToLangChainCode } from './utils.js';
 
 const args = process.argv.slice(2);
 
