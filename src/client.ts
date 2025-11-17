@@ -20,6 +20,10 @@ export class FluidToolsClient {
     }
 
 
+    public async authenticateClient(){
+        
+    }
+
     public async run() {
         console.log("Running FluidTools Client");
         console.log("Collection path: " + this.collectionPath);
