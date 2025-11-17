@@ -1,10 +1,8 @@
-import { z } from 'zod';
-import { tool } from 'langchain';
 import axios from 'axios';
 
 // Generated LangChain tools from Postman collection
 
-export function generateTools(authToken?: string) {
+export function generateTools(tool: any, z: any, authToken?: string) {
   const tools: Record<string, any> = {};
 
   // List Key Pairs

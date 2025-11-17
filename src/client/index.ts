@@ -1,11 +1,17 @@
 import FluidTools from "../langgraph/index.js";
 import { ProviderConfig } from "../langgraph/types.js";
 import { DEFAULT_SYSTEM_INSTRUCTIONS } from "./constants.js";
+import { z } from "zod";
+import { tool } from "langchain";
 
 class FluidToolsClient {
   private clientSecret: string;
   private clientId: string;
-  private toolsGenerator: (token?: string) => Record<string, any>;
+  private toolsGenerator: (
+    tool: any,
+    schemaBuilder: any,
+    token?: string
+  ) => Record<string, any>;
   private config: ProviderConfig;
   private systemInstructions: string;
 
@@ -13,7 +19,11 @@ class FluidToolsClient {
     clientId: string,
     clientSecret: string,
     config: ProviderConfig,
-    toolsGenerator: (token?: string) => Record<string, any>,
+    toolsGenerator: (
+      tool: any,
+      schemaBuilder: any,
+      token?: string
+    ) => Record<string, any>,
     systemInstructions: string = ""
   ) {
     this.clientId = clientId;
@@ -34,7 +44,7 @@ class FluidToolsClient {
   };
 
   public async query(query: string, accessToken?: string) {
-    const toolsByName = this.toolsGenerator(accessToken);
+    const toolsByName = this.toolsGenerator(tool, z, accessToken);
     const systemInstructions = this.getSystemInstructions();
     const fluidTool = new FluidTools(
       this.config,

@@ -7,8 +7,6 @@ const ACCESS_TOKEN = process.env.ACCESS_TOKEN || "";
 
 const providerConfig = loadProviderConfigFromEnv();
 
-console.log(providerConfig);
-
 const fluidToolsClient = new FluidToolsClient(
   "CLIENT_ID",
   "CLIENT_SECRET",

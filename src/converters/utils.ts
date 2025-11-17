@@ -51,9 +51,9 @@ function extractQueryParams(
 export function postmanToLangChainCode(collection: any): string {
   const requests = flattenPostmanCollection(collection);
 
-  let code = `import { z } from 'zod';\nimport { tool } from 'langchain';\nimport axios from 'axios';\n\n`;
+  let code = `import axios from 'axios';\n\n`;
   code += `// Generated LangChain tools from Postman collection\n\n`;
-  code += `export function generateTools(authToken?: string) {\n`;
+  code += `export function generateTools(tool: any, z: any, authToken?: string) {\n`;
   code += `  const tools: Record<string, any> = {};\n\n`;
 
   for (const request of requests) {
