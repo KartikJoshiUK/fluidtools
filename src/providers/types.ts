@@ -1,6 +1,6 @@
 // Provider type definitions
 
-export type ProviderType = 'ollama' | 'openai' | 'anthropic';
+export type ProviderType = 'ollama' | 'openai' | 'anthropic' | "gemini";
 
 export interface BaseProviderConfig {
     type: ProviderType;
@@ -30,4 +30,13 @@ export interface AnthropicConfig extends BaseProviderConfig {
     topP?: number;
 }
 
-export type ProviderConfig = OllamaConfig | OpenAIConfig | AnthropicConfig;
+export interface GeminiConfig extends BaseProviderConfig{
+    type: 'gemini';
+    apiKey: string;
+    temperature?: number;
+    maxTokens?: number;
+    topP?: number;
+
+}
+
+export type ProviderConfig = OllamaConfig | OpenAIConfig | AnthropicConfig | GeminiConfig;

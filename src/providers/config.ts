@@ -52,6 +52,15 @@ export function validateProviderConfig(config: ProviderConfig): void {
             }
             break;
 
+        case "gemini":
+            if (!config.apiKey) {
+                throw new ProviderConfigError('Gemini API key is required');
+            }
+            if (typeof config.apiKey !== 'string' || config.apiKey.trim() === '') {
+                throw new ProviderConfigError('Gemini API key must be a non-empty string');
+            }
+            break;
+
         default:
             throw new ProviderConfigError(`Unsupported provider type: ${(config as any).type}`);
     }
@@ -70,6 +79,9 @@ export function loadProviderConfigFromEnv(): ProviderConfig {
                 return 'gpt-4';
             case 'anthropic':
                 return 'claude-3-opus-20240229';
+
+            case 'gemini':
+                return 'gemini-2.5-flash-lite';
             default:
                 return 'llama3.2:3b';
         }
@@ -80,7 +92,7 @@ export function loadProviderConfigFromEnv(): ProviderConfig {
     // Helper function to parse numeric values with defaults
     const parseNumeric = (value: string | undefined, defaultValue: number | undefined): number | undefined => {
         if (value === undefined) {
-            return defauined;
+            return 
         }
         const parsed = parseFloat(value);
         return isNaN(parsed) ? defaultValue : parsed;
@@ -112,6 +124,16 @@ export function loadProviderConfigFromEnv(): ProviderConfig {
                 type: 'anthropic',
                 model,
                 apiKey: process.env.ANTHROPIC_API_KEY || '',
+                temperature: parseNumeric(process.env.PROVIDER_TEMPERATURE, 0.7),
+                maxTokens: parseNumeric(process.env.PROVIDER_MAX_TOKENS, undefined),
+                topP: parseNumeric(process.env.PROVIDER_TOP_P, undefined),
+            };
+        
+        case 'gemini':
+            return {
+                type: 'gemini',
+                model,
+                apiKey: process.env.GEMINI_API_KEY || '',
                 temperature: parseNumeric(process.env.PROVIDER_TEMPERATURE, 0.7),
                 maxTokens: parseNumeric(process.env.PROVIDER_MAX_TOKENS, undefined),
                 topP: parseNumeric(process.env.PROVIDER_TOP_P, undefined),
