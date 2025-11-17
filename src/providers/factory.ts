@@ -3,6 +3,7 @@
 import { ChatOllama } from "@langchain/ollama";
 import { ChatOpenAI } from "@langchain/openai";
 import { ChatAnthropic } from "@langchain/anthropic";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ProviderConfig } from "./types.js";
 import { validateProviderConfig } from "./config.js";
 
@@ -21,7 +22,7 @@ export function createProvider(config: ProviderConfig) {
 
         case 'openai':
             return new ChatOpenAI({
-                modelName: config.model,
+                model: config.model,
                 openAIApiKey: config.apiKey,
                 temperature: config.temperature,
                 maxTokens: config.maxTokens,
@@ -30,10 +31,19 @@ export function createProvider(config: ProviderConfig) {
 
         case 'anthropic':
             return new ChatAnthropic({
-                modelName: config.model,
+                model: config.model,
                 anthropicApiKey: config.apiKey,
                 temperature: config.temperature,
                 maxTokens: config.maxTokens,
+                topP: config.topP,
+            });
+        
+        case "gemini":
+             return new ChatGoogleGenerativeAI({
+                model: config.model,
+                apiKey: config.apiKey,
+                temperature: config.temperature,
+                maxOutputTokens: config.maxTokens,
                 topP: config.topP,
             });
 
