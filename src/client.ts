@@ -21,7 +21,9 @@ export class FluidToolsClient {
 
 
     public async authenticateClient(){
-        
+
+        //   we need to addd authorization logic here bso for that we need to create auth service 
+ 
     }
 
     public async run() {
