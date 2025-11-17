@@ -11,7 +11,12 @@ export function generateTools(authToken?: string) {
   const list_key_pairs = tool(
     async (args: any) => {
       try {
-        const res = await axios.get('https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee', {
+        let url = 'https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee';
+        const params = new URLSearchParams();
+        if (args.region) params.append('region', args.region);
+        if (args.project_id) params.append('project_id', args.project_id);
+        if (params.toString()) url += (url.includes('?') ? '&' : '?') + params.toString();
+        const res = await axios.get(url, {
           headers: authToken ? { 'Authorization': `Bearer ${authToken}` } : {},
         });
         return JSON.stringify(res.data, null, 2);
@@ -23,7 +28,8 @@ export function generateTools(authToken?: string) {
       name: 'list_key_pairs',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee',
       schema: z.object({
-        query: z.string(),
+        region: z.string().optional().describe('region parameter'),
+        project_id: z.string().optional().describe('project_id parameter'),
       }),
     }
   );
@@ -45,7 +51,7 @@ export function generateTools(authToken?: string) {
       name: 'create_key_pair',
       description: 'POST request to https://customer.acecloudhosting.com/api/v1/cloud/key-pairs?region=ap-south-noi-1&project_id=6912690968ce46cb8ac7b4a96e91beee',
       schema: z.object({
-        body: z.any(),
+        body: z.any().optional(),
       }),
     }
   );
@@ -67,7 +73,7 @@ export function generateTools(authToken?: string) {
       name: 'wallet_status',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/wallet',
       schema: z.object({
-        query: z.string(),
+        query: z.string().optional(),
       }),
     }
   );
@@ -89,7 +95,7 @@ export function generateTools(authToken?: string) {
       name: 'user_status',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/auth/user-status',
       schema: z.object({
-        query: z.string(),
+        query: z.string().optional(),
       }),
     }
   );
@@ -111,7 +117,7 @@ export function generateTools(authToken?: string) {
       name: 'allowed_projects',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/projects/allowed-projects',
       schema: z.object({
-        query: z.string(),
+        query: z.string().optional(),
       }),
     }
   );
@@ -133,7 +139,7 @@ export function generateTools(authToken?: string) {
       name: 'wallet_details',
       description: 'GET request to https://customer.acecloudhosting.com/api/v1/billing/info',
       schema: z.object({
-        query: z.string(),
+        query: z.string().optional(),
       }),
     }
   );
