@@ -45,22 +45,120 @@ function extractQueryParams(
 }
 
 /**
+ * Generate a semantic tool name from the request
+ */
+function generateToolName(
+  request: PostmanRequest,
+  url: string,
+  method: string
+): string {
+  // If the request name is meaningful (not just "New Request"), use it
+  if (request.name && !request.name.toLowerCase().includes("new request")) {
+    return request.name
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_]/g, "_")
+      .replace(/^[0-9]/, "_$&")
+      .toLowerCase();
+  }
+
+  // Otherwise, generate from URL path
+  const pathMatch = url.match(/\/([^/?]+)(?:\/[^/?]*)?$/);
+  const resource = pathMatch ? pathMatch[1] : "api";
+
+  const methodPrefix = method.toLowerCase();
+  return `${methodPrefix}_${resource}`.replace(/[^a-zA-Z0-9_]/g, "_");
+}
+
+/**
+ * Generate a semantic description based on the endpoint
+ * Prioritizes user-provided descriptions from Postman
+ */
+function generateSmartDescription(request: PostmanRequest): string {
+  const method = request.request.method || "GET";
+  const url = request.request.url?.raw || "";
+  const name = request.name;
+
+  // Check if user provided a description in Postman
+  const userDescription = (request.request as any).description;
+  if (userDescription) {
+    // User provided description - use it!
+    return typeof userDescription === "string"
+      ? userDescription
+      : userDescription.content || userDescription;
+  }
+
+  // Fallback: Generate description automatically
+  const pathMatch = url.match(/\/([^/?]+)(?:\?|$)/);
+  const resource = pathMatch ? pathMatch[1] : "resource";
+
+  let action = "";
+  switch (method.toUpperCase()) {
+    case "GET":
+      action = name.toLowerCase().includes("list")
+        ? "Retrieves a list of"
+        : "Retrieves information about";
+      break;
+    case "POST":
+      action = "Creates a new";
+      break;
+    case "PUT":
+    case "PATCH":
+      action = "Updates an existing";
+      break;
+    case "DELETE":
+      action = "Deletes a";
+      break;
+    default:
+      action = "Performs an operation on";
+  }
+
+  return `${action} ${resource.replace(/-/g, " ")}. Endpoint: ${method} ${url}`;
+}
+
+/**
  * Generate LangChain-compatible Zod schema code as a string
  * This returns TypeScript code that can be used with LangChain's tool() function
  */
 export function postmanToLangChainCode(collection: any): string {
   const requests = flattenPostmanCollection(collection);
 
-  let code = `import axios from 'axios';\n\n`;
-  code += `// Generated LangChain tools from Postman collection\n\n`;
-  code += `export function generateTools(tool: any, z: any, authToken?: string) {\n`;
+  let code = `// Generated LangChain tools from Postman collection\n`;
+  code += `// Collection: ${collection.info?.name || "Unknown"}\n\n`;
+  code += `export function generateTools(tool: any, z: any, axios: any, authToken?: string) {\n`;
   code += `  const tools: Record<string, any> = {};\n\n`;
 
+  const usedNames = new Set<string>();
+
   for (const request of requests) {
-    const name = request.name.replace(/\s+/g, "_").toLowerCase();
     const method = request.request.method || "GET";
     const url = request.request.url?.raw || "";
-    const description = `${method} request to ${url}`;
+
+    // Skip requests with empty URLs
+    if (!url || url.trim() === "") {
+      console.warn(`⚠️  Skipping request "${request.name}" - no URL provided`);
+      continue;
+    }
+
+    // Generate a valid and semantic JavaScript variable name
+    let name = generateToolName(request, url, method);
+
+    // Ensure unique names by appending index if duplicate
+    let uniqueName = name;
+    let counter = 1;
+    while (usedNames.has(uniqueName)) {
+      uniqueName = `${name}_${counter}`;
+      counter++;
+    }
+    name = uniqueName;
+    usedNames.add(name);
+
+    const description = generateSmartDescription(request)
+      .replace(/\n/g, " ") // Remove all newlines (use regex with g flag)
+      .replace(/\r/g, " ") // Remove carriage returns
+      .replace(/'/g, "\\'") // Escape single quotes
+      .replace(/`/g, "\\`") // Escape backticks
+      .trim();
+
     const queryParams = extractQueryParams(request);
 
     code += `  // ${request.name}\n`;
