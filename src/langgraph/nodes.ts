@@ -21,6 +21,7 @@ const getAgent = (
 
     const aiMessage = await modelWithTools.invoke(messages);
 
+
     return {
       messages: [aiMessage]  // ✅ Only return new message - LangGraph handles merging
     };
@@ -28,13 +29,13 @@ const getAgent = (
 
   async function toolNode(state: typeof MessagesState.State) {
     const lastMessage = state.messages.at(-1);
-
+console.log("bsdk phle log kar");
     if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
       return { messages: [] };  // ✅ Return empty array - no new messages
     }
 
     const result: ToolMessage[] = [];
-
+   console.log(lastMessage.tool_calls,"bsdk log kar");
     for (const toolCall of lastMessage.tool_calls ?? []) {
       const tool = toolsByName[toolCall.name];
       const observation = await tool.invoke(toolCall);
