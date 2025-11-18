@@ -104,8 +104,11 @@ class FluidToolsClient {
     return prompt;
   };
 
-  public async query(query: string, accessToken?: string) {
-    const toolsByName = this.toolsGenerator(tool, z, axios, accessToken);
+  public async query(
+    query: string,
+    accessToken?: string
+  ) {
+    const toolsByName = this.toolsGenerator(tool, z, accessToken);
     const systemInstructions = this.getSystemInstructions(toolsByName);
     const fluidTool = new FluidTools(
       this.config,

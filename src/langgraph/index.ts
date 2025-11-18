@@ -11,6 +11,7 @@ class FluidTools {
   private model;
   private agent;
   private maxToolCalls: number;
+  private config: ProviderConfig;
 
   constructor(
     config: ProviderConfig,
@@ -18,16 +19,19 @@ class FluidTools {
     systemInstructions: string = DEFAULT_SYSTEM_INSTRUCTIONS,
     maxToolCalls: number = 10
   ) {
+    this.config = config;
     this.model = createProvider(config);
     this.agent = getAgent(this.model, tools, systemInstructions);
     this.maxToolCalls = maxToolCalls;
   }
 
   public async query(query: string) {
-    const result = await this.agent.invoke({
-      messages: [new HumanMessage(query)],
-      maxToolCalls: this.maxToolCalls,
-    });
+    const result = await this.agent.invoke(
+      {
+        messages: [new HumanMessage(query)],
+        maxToolCalls: this.maxToolCalls,
+      }
+    );
 
     return result;
   }

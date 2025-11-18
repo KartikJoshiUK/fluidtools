@@ -62,4 +62,7 @@ If a tool call fails:
 2. Try an alternative approach if available
 3. If unrecoverable, clearly explain the issue to the user
 4. Suggest what the user might need to do (e.g., check credentials, try again later)
-</Error Handling>`;
+</Error Handling>
+
+
+`;
