@@ -1,6 +1,6 @@
 {
   "name": "fluidtools",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "AI-powered API multi tool agent with multi-provider support (OpenAI, Anthropic, Ollama)",
   "homepage": "https://github.com/KartikJoshiUK/fluidtools#readme",
   "bugs": {

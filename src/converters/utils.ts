@@ -122,10 +122,9 @@ function generateSmartDescription(request: PostmanRequest): string {
 export function postmanToLangChainCode(collection: any): string {
   const requests = flattenPostmanCollection(collection);
 
-  let code = `import axios from 'axios';\n\n`;
-  code += `// Generated LangChain tools from Postman collection\n`;
+  let code = `// Generated LangChain tools from Postman collection\n`;
   code += `// Collection: ${collection.info?.name || "Unknown"}\n\n`;
-  code += `export function generateTools(tool: any, z: any, authToken?: string) {\n`;
+  code += `export function generateTools(tool: any, z: any, axios: any, authToken?: string) {\n`;
   code += `  const tools: Record<string, any> = {};\n\n`;
 
   const usedNames = new Set<string>();
