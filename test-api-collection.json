@@ -1,0 +1,223 @@
+{
+  "info": {
+    "_postman_id": "test-api-collection-001",
+    "name": "FluidTools Test API",
+    "description": "Test API endpoints for FluidTools agent testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Wallet",
+      "item": [
+        {
+          "name": "Get Wallet Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/wallet?userId=1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "wallet"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "1",
+                  "description": "User ID to get balance for"
+                }
+              ]
+            },
+            "description": "Retrieves the wallet balance for a specific user. Returns balance in USD, user name, and last updated timestamp. Use this when users ask about their account balance or available funds."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/transactions?userId=1&limit=10&startDate=2024-01-01&endDate=2024-12-31&category=Groceries",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "transactions"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "1",
+                  "description": "User ID to get transactions for"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Maximum number of transactions to return"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01",
+                  "description": "Start date for filtering (YYYY-MM-DD format)"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31",
+                  "description": "End date for filtering (YYYY-MM-DD format)"
+                },
+                {
+                  "key": "category",
+                  "value": "Groceries",
+                  "description": "Filter by transaction category"
+                }
+              ]
+            },
+            "description": "Retrieves transaction history for a user with optional date range and category filtering. Returns transactions with summary statistics including total credits, debits, and net change. Use this when users want to see transactions for a specific time period or category, analyze spending patterns, or get financial summaries."
+          },
+          "response": []
+        },
+        {
+          "name": "Transfer Money",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromUserId\": 1,\n  \"toUserId\": 2,\n  \"amount\": 100,\n  \"description\": \"Payment for services\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/transfer",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "transfer"]
+            },
+            "description": "Transfers money from one user to another. Requires fromUserId, toUserId, and amount in the request body. Returns transaction ID, updated balances, and timestamp. Use this when users want to send money or make a payment. Validates sufficient balance before processing."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Get Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/tasks?status=pending&priority=high",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "Filter by status: pending, in-progress, or completed"
+                },
+                {
+                  "key": "priority",
+                  "value": "high",
+                  "description": "Filter by priority: low, medium, or high"
+                }
+              ]
+            },
+            "description": "Retrieves a list of tasks with optional filtering by status and priority. Returns task ID, title, status, and priority. Use this when users want to see their tasks, check pending items, or filter by priority level."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New task to complete\",\n  \"priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/tasks",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "tasks"]
+            },
+            "description": "Creates a new task with a title and optional priority level. Returns the created task with ID and status set to 'pending'. Use this when users want to add a new task or create a to-do item. Priority defaults to 'medium' if not specified."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Spending Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/analytics/spending?userId=1&startDate=2024-01-01&endDate=2024-12-31",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["api", "analytics", "spending"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "1",
+                  "description": "User ID to analyze spending for"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01",
+                  "description": "Start date for analysis period (YYYY-MM-DD format)"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31",
+                  "description": "End date for analysis period (YYYY-MM-DD format)"
+                }
+              ]
+            },
+            "description": "Analyzes spending patterns by category for a specific time period. Returns total spending, breakdown by category with transaction counts, and identifies the top spending category. Use this when users want to understand their spending habits, find their biggest expense categories, or analyze financial patterns over time."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["health"]
+        },
+        "description": "Health check endpoint to verify the API server is running. Returns status and current timestamp."
+      },
+      "response": []
+    }
+  ]
+}

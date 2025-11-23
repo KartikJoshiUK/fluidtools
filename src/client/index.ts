@@ -17,6 +17,7 @@ class FluidToolsClient {
   private config: ProviderConfig;
   private systemInstructions: string;
   private maxToolCalls: number;
+  private fluidTool: FluidTools; // Reuse the same instance to preserve memory
 
   constructor(
     clientId: string,
@@ -37,36 +38,19 @@ class FluidToolsClient {
     this.config = config;
     this.systemInstructions = systemInstructions;
     this.maxToolCalls = maxToolCalls;
+
+    // Initialize FluidTools once to preserve conversation history
+    const toolsByName = this.toolsGenerator(tool, z, undefined);
+    const fullSystemInstructions = this.getSystemInstructions();
+    this.fluidTool = new FluidTools(
+      this.config,
+      toolsByName,
+      fullSystemInstructions,
+      this.maxToolCalls
+    );
   }
 
-  private getToolDescriptions = (toolsByName: Record<string, any>): string => {
-    const toolNames = Object.keys(toolsByName);
-    if (toolNames.length === 0) return "";
-
-    const descriptions = toolNames
-      .map((name, index) => {
-        const tool = toolsByName[name];
-        const description = tool.description || "No description available";
-
-        // Extract schema information if available
-        let schemaInfo = "";
-        if (tool.schema && tool.schema.shape) {
-          const params = Object.keys(tool.schema.shape);
-          if (params.length > 0) {
-            schemaInfo = `\n   Parameters: ${params.join(", ")}`;
-          }
-        }
-
-        return `${
-          index + 1
-        }. **${name}**\n   Description: ${description}${schemaInfo}`;
-      })
-      .join("\n\n");
-
-    return `\n\n<Your Available Tools>\nYou have access to ${toolNames.length} tool(s). Use them to gather information or perform actions.\n\n${descriptions}\n</Your Available Tools>`;
-  };
-
-  private getSystemInstructions = (toolsByName?: Record<string, any>) => {
+  private getSystemInstructions = () => {
     const currentDate = new Date().toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
@@ -75,10 +59,8 @@ class FluidToolsClient {
     });
 
     // Build context variables for template replacement
-    const toolCount = toolsByName ? Object.keys(toolsByName).length : 0;
     const contextVars: Record<string, string> = {
       "{date}": currentDate,
-      "{tool_count}": toolCount.toString(),
       "{max_tool_calls}": this.maxToolCalls.toString(),
     };
 
@@ -87,11 +69,6 @@ class FluidToolsClient {
     Object.entries(contextVars).forEach(([key, value]) => {
       prompt = prompt.replace(new RegExp(key, "g"), value);
     });
-
-    // Add tool descriptions if tools are provided
-    if (toolsByName && toolCount > 0) {
-      prompt += this.getToolDescriptions(toolsByName);
-    }
 
     // Add custom instructions if provided
     if (this.systemInstructions) {
@@ -104,18 +81,32 @@ class FluidToolsClient {
     return prompt;
   };
 
-  public async query(query: string, accessToken?: string) {
-    const toolsByName = this.toolsGenerator(tool, z, axios, accessToken);
-    const systemInstructions = this.getSystemInstructions(toolsByName);
-    const fluidTool = new FluidTools(
-      this.config,
-      toolsByName,
-      systemInstructions,
-      this.maxToolCalls
-    );
-    const response = await fluidTool.query(query);
+  public async query(
+    query: string,
+    accessToken?: string
+  ) {
+    console.log('\n🎯 [FluidToolsClient.query] Query received:', query);
+    // Reuse the same FluidTools instance to preserve conversation history
+    const response = await this.fluidTool.query(query);
+
+    console.log('📦 [FluidToolsClient.query] Response messages:', response.messages.length);
+    console.log('📄 [FluidToolsClient.query] Last message content:', response.messages.at(-1)?.content);
 
     return response.messages.at(-1)?.content;
+  }
+
+  /**
+   * Get the current conversation state
+   */
+  public async getConversationState() {
+    return await this.fluidTool.getConversationState();
+  }
+
+  /**
+   * Print the full conversation history to console
+   */
+  public async printConversationHistory() {
+    await this.fluidTool.printConversationHistory();
   }
 }
 
