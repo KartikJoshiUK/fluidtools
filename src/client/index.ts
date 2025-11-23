@@ -38,16 +38,12 @@ class FluidToolsClient {
     this.config = config;
     this.systemInstructions = systemInstructions;
     this.maxToolCalls = maxToolCalls;
-
-    // Initialize FluidTools once to preserve conversation history
-    const toolsByName = this.toolsGenerator(tool, z, undefined);
-    const fullSystemInstructions = this.getSystemInstructions();
     this.fluidTool = new FluidTools(
       this.config,
-      toolsByName,
-      fullSystemInstructions,
+      {},
+      DEFAULT_SYSTEM_INSTRUCTIONS,
       this.maxToolCalls
-    );
+    ); // Initialize with empty tools
   }
 
   private getSystemInstructions = () => {
@@ -81,16 +77,27 @@ class FluidToolsClient {
     return prompt;
   };
 
-  public async query(
-    query: string,
-    accessToken?: string
-  ) {
-    console.log('\n🎯 [FluidToolsClient.query] Query received:', query);
+  public async query(query: string, accessToken?: string) {
+    const toolsByName = this.toolsGenerator(tool, z, axios, accessToken);
+    const fullSystemInstructions = this.getSystemInstructions();
+    this.fluidTool = new FluidTools(
+      this.config,
+      toolsByName,
+      fullSystemInstructions,
+      this.maxToolCalls
+    );
+    console.log("\n🎯 [FluidToolsClient.query] Query received:", query);
     // Reuse the same FluidTools instance to preserve conversation history
     const response = await this.fluidTool.query(query);
 
-    console.log('📦 [FluidToolsClient.query] Response messages:', response.messages.length);
-    console.log('📄 [FluidToolsClient.query] Last message content:', response.messages.at(-1)?.content);
+    console.log(
+      "📦 [FluidToolsClient.query] Response messages:",
+      response.messages.length
+    );
+    console.log(
+      "📄 [FluidToolsClient.query] Last message content:",
+      response.messages.at(-1)?.content
+    );
 
     return response.messages.at(-1)?.content;
   }

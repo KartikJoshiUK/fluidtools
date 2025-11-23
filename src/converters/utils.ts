@@ -39,9 +39,74 @@ function extractQueryParams(
         });
       }
     }
+  } else if (typeof request.request.url === "string") {
+    // parse inline query string fallback
+    const raw = request.request.url as string;
+    const qsIndex = raw.indexOf("?");
+    if (qsIndex !== -1) {
+      const params = new URLSearchParams(raw.slice(qsIndex + 1));
+      for (const [key] of params) {
+        queryParams.push({ key, description: `${key} parameter` });
+      }
+    }
   }
 
   return queryParams;
+}
+
+/**
+ * Extract path parameters from URL string (handles :id, {{id}}, {id})
+ */
+function extractPathParams(
+  request: PostmanRequest
+): Array<{ key: string; description: string }> {
+  const pathParams: Array<{ key: string; description: string }> = [];
+  const raw = request.request.url?.raw || "";
+
+  // Match :param style
+  const colonMatches = Array.from(raw.matchAll(/:([A-Za-z0-9_]+)/g)).map(
+    (m) => m[1]
+  );
+  for (const k of colonMatches) {
+    pathParams.push({ key: k, description: `${k} path parameter` });
+  }
+
+  // Match {{param}} style
+  const mustacheMatches = Array.from(
+    raw.matchAll(/{{\s*([A-Za-z0-9_]+)\s*}}/g)
+  ).map((m) => m[1]);
+  for (const k of mustacheMatches) {
+    if (!pathParams.find((p) => p.key === k))
+      pathParams.push({ key: k, description: `${k} path parameter` });
+  }
+
+  // Match {param} style
+  const braceMatches = Array.from(raw.matchAll(/{([A-Za-z0-9_]+)}/g)).map(
+    (m) => m[1]
+  );
+  for (const k of braceMatches) {
+    if (!pathParams.find((p) => p.key === k))
+      pathParams.push({ key: k, description: `${k} path parameter` });
+  }
+
+  // Also try url.path array (Postman structured)
+  if (request.request.url && typeof request.request.url === "object") {
+    const urlObj = request.request.url as any;
+    if (Array.isArray(urlObj.path)) {
+      for (const segment of urlObj.path) {
+        const m = String(segment).match(/^:([A-Za-z0-9_]+)$/);
+        if (m) {
+          if (!pathParams.find((p) => p.key === m[1]))
+            pathParams.push({
+              key: m[1],
+              description: `${m[1]} path parameter`,
+            });
+        }
+      }
+    }
+  }
+
+  return pathParams;
 }
 
 /**
@@ -77,6 +142,7 @@ function generateSmartDescription(request: PostmanRequest): string {
   const method = request.request.method || "GET";
   const url = request.request.url?.raw || "";
   const name = request.name;
+  const givenDescription = request.request.description ?? "";
 
   // Check if user provided a description in Postman
   const userDescription = (request.request as any).description;
@@ -94,7 +160,7 @@ function generateSmartDescription(request: PostmanRequest): string {
   let action = "";
   switch (method.toUpperCase()) {
     case "GET":
-      action = name.toLowerCase().includes("list")
+      action = name?.toLowerCase().includes("list")
         ? "Retrieves a list of"
         : "Retrieves information about";
       break;
@@ -112,7 +178,10 @@ function generateSmartDescription(request: PostmanRequest): string {
       action = "Performs an operation on";
   }
 
-  return `${action} ${resource.replace(/-/g, " ")}. Endpoint: ${method} ${url}`;
+  return `${action} ${resource.replace(
+    /-/g,
+    " "
+  )}. ${givenDescription}. Endpoint: ${method} ${url}`;
 }
 
 /**
@@ -130,8 +199,8 @@ export function postmanToLangChainCode(collection: any): string {
   const usedNames = new Set<string>();
 
   for (const request of requests) {
-    const method = request.request.method || "GET";
-    const url = request.request.url?.raw || "";
+    const method = (request.request.method || "GET").toUpperCase();
+    const url = (request.request.url?.raw || "")?.split("?")[0]; // strip query for base URL
 
     // Skip requests with empty URLs
     if (!url || url.trim() === "") {
@@ -160,37 +229,70 @@ export function postmanToLangChainCode(collection: any): string {
       .trim();
 
     const queryParams = extractQueryParams(request);
+    const pathParams = extractPathParams(request);
 
     code += `  // ${request.name}\n`;
     code += `  const ${name} = tool(\n`;
     code += `    async (args: any) => {\n`;
     code += `      try {\n`;
+    // Build runtime URL and params handling
+    code += `        let url = \`${url}\`;\n`;
+    // Build params object
+    code += `        const params: any = {};\n`;
+    for (const param of queryParams) {
+      code += `        if (args.${param.key} !== undefined) params['${param.key}'] = args.${param.key};\n`;
+    }
+    // Replace path placeholders
+    for (const p of pathParams) {
+      // handle {{param}}, :param and {param}
+      code += `        if (args.${p.key} !== undefined) {\n`;
+      code += `          url = url.replace(new RegExp('{{\\\\s*${p.key}\\\\s*}}','g'), String(args.${p.key}));\n`;
+      code += `          url = url.replace(new RegExp(':' + ${JSON.stringify(
+        p.key
+      )} + '(?=/|$)','g'), String(args.${p.key}));\n`;
+      code += `          url = url.replace(new RegExp('{' + ${JSON.stringify(
+        p.key
+      )} + '}','g'), String(args.${p.key}));\n`;
+      code += `        }\n`;
+    }
 
-    if (method === "GET") {
-      // Build URL with query parameters if provided
-      if (queryParams.length > 0) {
-        code += `        let url = '${url}';\n`;
-        code += `        const params = new URLSearchParams();\n`;
-        for (const param of queryParams) {
-          code += `        if (args.${param.key}) params.append('${param.key}', args.${param.key});\n`;
-        }
-        code += `        if (params.toString()) url += (url.includes('?') ? '&' : '?') + params.toString();\n`;
-        code += `        const res = await axios.get(url, {\n`;
-      } else {
-        code += `        const res = await axios.get('${url}', {\n`;
-      }
-      code += `          headers: authToken ? { 'Authorization': \`Bearer \${authToken}\` } : {},\n`;
+    // Log the exact request that will be sent
+    code += `        console.log('⤴ Request:', JSON.stringify({ method: '${method}', url, params, body: args.body ?? null }, null, 2));\n\n`;
+
+    // Axios call per method
+    const lower = method.toLowerCase();
+    if (method === "GET" || method === "HEAD") {
+      code += `        const res = await axios.${lower}(url, {\n`;
+      code += `          params,\n`;
+      code += `          headers: authToken ? { Authorization: \`Bearer \${authToken}\` } : {},\n`;
       code += `        });\n`;
-    } else if (method === "POST" || method === "PUT") {
-      code += `        const res = await axios.${method.toLowerCase()}('${url}', args.body || {}, {\n`;
-      code += `          headers: authToken ? { 'Authorization': \`Bearer \${authToken}\` } : {},\n`;
+    } else if (method === "DELETE") {
+      // axios.delete(url, { params, data, headers })
+      code += `        const res = await axios.delete(url, {\n`;
+      code += `          params,\n`;
+      code += `          data: args.body ?? {},\n`;
+      code += `          headers: authToken ? { Authorization: \`Bearer \${authToken}\` } : {},\n`;
+      code += `        });\n`;
+    } else {
+      // POST, PUT, PATCH, etc. axios.post(url, data, { params, headers })
+      code += `        const res = await axios.${lower}(url, args.body ?? {}, {\n`;
+      code += `          params,\n`;
+      code += `          headers: authToken ? { Authorization: \`Bearer \${authToken}\` } : {},\n`;
       code += `        });\n`;
     }
 
+    // Log response
+    code += `        console.log('⤵ Response:', JSON.stringify(res.data, null, 2));\n`;
     code += `        return JSON.stringify(res.data, null, 2);\n`;
     code += `      } catch (err: any) {\n`;
-    code += `        console.log("🚨 API ERROR");\n`;
-    code += `        return \`Error: \${err.message}\`;\n`;
+    code += `        // More detailed error logging including response body if available\n`;
+    code += `        if (err.response) {\n`;
+    code += `          console.log('🚨 API ERROR STATUS:', err.response.status);\n`;
+    code += `          console.log('🚨 API ERROR BODY:', JSON.stringify(err.response.data, null, 2));\n`;
+    code += `          return \`Error: \${err.message} - Status: \${err.response.status}\\n\${JSON.stringify(err.response.data, null, 2)}\`;\n`;
+    code += `        }\n`;
+    code += `        console.log('🚨 API ERROR', err.message || err);\n`;
+    code += `        return \`Error: \${err.message || err}\`;\n`;
     code += `      }\n`;
     code += `    },\n`;
     code += `    {\n`;
@@ -199,17 +301,21 @@ export function postmanToLangChainCode(collection: any): string {
     code += `      schema: z.object({\n`;
 
     // Add query parameters as individual fields
-    if (method === "GET" && queryParams.length > 0) {
+    if (queryParams.length > 0) {
       for (const param of queryParams) {
         code += `        ${param.key}: z.string().optional().describe('${param.description}'),\n`;
       }
-    } else if (method === "GET") {
-      code += `        query: z.string().optional(),\n`;
     }
 
-    if (method === "POST" || method === "PUT") {
-      code += `        body: z.any().optional(),\n`;
+    // Add path params
+    if (pathParams.length > 0) {
+      for (const param of pathParams) {
+        code += `        ${param.key}: z.string().optional().describe('${param.description}'),\n`;
+      }
     }
+
+    // Always allow a body for non-GET methods (and optional for GET)
+    code += `        body: z.any().optional().describe('Request body'),\n`;
 
     code += `      }),\n`;
     code += `    }\n`;
