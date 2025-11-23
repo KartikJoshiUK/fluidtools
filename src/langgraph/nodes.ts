@@ -19,10 +19,8 @@ const getAgent = (
       maxToolCalls: state.maxToolCalls
     });
 
-    // Only include system message if this is the first call
-    const messages = state.messages.length === 0
-      ? [systemMessage, ...state.messages]
-      : state.messages;
+    
+    const messages = [systemMessage, ...state.messages];
 
     console.log('📤 [llmCall] Sending messages to LLM:', messages.length);
     const aiMessage = await modelWithTools.invoke(messages);
