@@ -1,23 +1,18 @@
 import FluidTools from "../langgraph/index.js";
 import { ProviderConfig } from "../langgraph/types.js";
 import { DEFAULT_SYSTEM_INSTRUCTIONS } from "../langgraph/constants.js";
-import { z } from "zod";
-import { tool } from "langchain";
-import axios from "axios";
+import { logger } from "../utils/index.js";
+import { Tools } from "../langgraph/tool.js";
 
 class FluidToolsClient {
   private clientSecret: string;
   private clientId: string;
-  private toolsGenerator: (
-    tool: any,
-    schemaBuilder: any,
-    axios: any,
-    token?: string
-  ) => Record<string, any>;
   private config: ProviderConfig;
   private systemInstructions: string;
   private maxToolCalls: number;
   private fluidTool: FluidTools; // Reuse the same instance to preserve memory
+  private debug: boolean;
+  private tools: Tools;
 
   constructor(
     clientId: string,
@@ -30,20 +25,22 @@ class FluidToolsClient {
       token?: string
     ) => Record<string, any>,
     systemInstructions: string = "",
-    maxToolCalls: number = 10
+    maxToolCalls: number = 10,
+    debug: boolean = false
   ) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.toolsGenerator = toolsGenerator;
+    this.tools = new Tools(toolsGenerator);
     this.config = config;
     this.systemInstructions = systemInstructions;
     this.maxToolCalls = maxToolCalls;
     this.fluidTool = new FluidTools(
       this.config,
-      {},
-      DEFAULT_SYSTEM_INSTRUCTIONS,
+      this.tools,
+      this.getSystemInstructions(),
       this.maxToolCalls
     ); // Initialize with empty tools
+    this.debug = debug;
   }
 
   private getSystemInstructions = () => {
@@ -78,23 +75,18 @@ class FluidToolsClient {
   };
 
   public async query(query: string, accessToken?: string) {
-    const toolsByName = this.toolsGenerator(tool, z, axios, accessToken);
-    const fullSystemInstructions = this.getSystemInstructions();
-    this.fluidTool = new FluidTools(
-      this.config,
-      toolsByName,
-      fullSystemInstructions,
-      this.maxToolCalls
-    );
-    console.log("\n🎯 [FluidToolsClient.query] Query received:", query);
+    logger(this.debug, "\n🎯 [FluidToolsClient.query] Query received:", query);
     // Reuse the same FluidTools instance to preserve conversation history
+    if (accessToken) this.tools.AccessToken = accessToken;
     const response = await this.fluidTool.query(query);
 
-    console.log(
+    logger(
+      this.debug,
       "📦 [FluidToolsClient.query] Response messages:",
       response.messages.length
     );
-    console.log(
+    logger(
+      this.debug,
       "📄 [FluidToolsClient.query] Last message content:",
       response.messages.at(-1)?.content
     );
