@@ -1,6 +1,6 @@
 {
   "name": "fluidtools",
-  "version": "1.0.6",
+  "version": "1.0.10",
   "description": "AI-powered API multi tool agent with multi-provider support (OpenAI, Anthropic, Ollama)",
   "homepage": "https://github.com/KartikJoshiUK/fluidtools#readme",
   "bugs": {
@@ -24,6 +24,9 @@
   },
   "files": [
     "dist",
+    "!dist/temp-server",
+    "README.md",
+    "package.json",
     "LICENSE"
   ],
   "keywords": [
@@ -41,7 +44,7 @@
     "prepare": "npm run build",
     "start": "npm run build && node dist/index.js",
     "dev": "npm run build && node dist/src/langgraph/index.js"
-},
+  },
   "dependencies": {
     "@langchain/anthropic": "^1.0.1",
     "@langchain/community": "^1.0.3",
