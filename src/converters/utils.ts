@@ -240,19 +240,19 @@ export function postmanToLangChainCode(collection: any): string {
     // Build params object
     code += `        const params: any = {};\n`;
     for (const param of queryParams) {
-      code += `        if (args.${param.key} !== undefined) params['${param.key}'] = args.${param.key};\n`;
+      code += `        if (args['${param.key}'] !== undefined) params['${param.key}'] = args['${param.key}'];\n`;
     }
     // Replace path placeholders
     for (const p of pathParams) {
       // handle {{param}}, :param and {param}
-      code += `        if (args.${p.key} !== undefined) {\n`;
-      code += `          url = url.replace(new RegExp('{{\\\\s*${p.key}\\\\s*}}','g'), String(args.${p.key}));\n`;
+      code += `        if (args['${p.key}'] !== undefined) {\n`;
+      code += `          url = url.replace(new RegExp('{{\\\\s*${p.key}\\\\s*}}','g'), String(args['${p.key}']));\n`;
       code += `          url = url.replace(new RegExp(':' + ${JSON.stringify(
         p.key
-      )} + '(?=/|$)','g'), String(args.${p.key}));\n`;
+      )} + '(?=/|$)','g'), String(args['${p.key}']));\n`;
       code += `          url = url.replace(new RegExp('{' + ${JSON.stringify(
         p.key
-      )} + '}','g'), String(args.${p.key}));\n`;
+      )} + '}','g'), String(args['${p.key}']));\n`;
       code += `        }\n`;
     }
 
@@ -303,14 +303,14 @@ export function postmanToLangChainCode(collection: any): string {
     // Add query parameters as individual fields
     if (queryParams.length > 0) {
       for (const param of queryParams) {
-        code += `        ${param.key}: z.string().optional().describe('${param.description}'),\n`;
+        code += `        '${param.key}': z.string().optional().describe('${param.description}'),\n`;
       }
     }
 
     // Add path params
     if (pathParams.length > 0) {
       for (const param of pathParams) {
-        code += `        ${param.key}: z.string().optional().describe('${param.description}'),\n`;
+        code += `        '${param.key}': z.string().optional().describe('${param.description}'),\n`;
       }
     }
 
