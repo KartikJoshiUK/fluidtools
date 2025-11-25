@@ -63,8 +63,12 @@ function extractPathParams(
   const pathParams: Array<{ key: string; description: string }> = [];
   const raw = request.request.url?.raw || "";
 
-  // Match :param style
-  const colonMatches = Array.from(raw.matchAll(/:([A-Za-z0-9_]+)/g)).map(
+  // Remove protocol and host:port to avoid matching port numbers as params
+  // e.g., "http://localhost:8000/users/:id" → "/users/:id"
+  const pathOnly = raw.replace(/^[a-zA-Z]+:\/\/[^/]+/, "");
+
+  // Match :param style (only in path, not port numbers)
+  const colonMatches = Array.from(pathOnly.matchAll(/:([A-Za-z_][A-Za-z0-9_]*)/g)).map(
     (m) => m[1]
   );
   for (const k of colonMatches) {
@@ -107,6 +111,91 @@ function extractPathParams(
   }
 
   return pathParams;
+}
+
+/**
+ * Extract body fields from Postman request body (raw JSON mode)
+ * Returns an array of field definitions with inferred types
+ */
+function extractBodyFields(
+  request: PostmanRequest
+): Array<{ key: string; type: string; description: string; required: boolean }> {
+  const bodyFields: Array<{ key: string; type: string; description: string; required: boolean }> = [];
+
+  const body = (request.request as any).body;
+  if (!body) return bodyFields;
+
+  // Handle raw JSON body
+  if (body.mode === "raw" && body.raw) {
+    try {
+      const parsed = JSON.parse(body.raw);
+      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
+        for (const [key, value] of Object.entries(parsed)) {
+          const zodType = inferZodType(value);
+          bodyFields.push({
+            key,
+            type: zodType,
+            description: `${key} field`,
+            required: false, // Make all optional for flexibility
+          });
+        }
+      }
+    } catch {
+      // JSON parse failed, skip body field extraction
+    }
+  }
+
+  // Handle urlencoded body
+  if (body.mode === "urlencoded" && Array.isArray(body.urlencoded)) {
+    for (const field of body.urlencoded) {
+      bodyFields.push({
+        key: field.key,
+        type: "z.string()",
+        description: field.description || `${field.key} field`,
+        required: false,
+      });
+    }
+  }
+
+  // Handle formdata body
+  if (body.mode === "formdata" && Array.isArray(body.formdata)) {
+    for (const field of body.formdata) {
+      const isFile = field.type === "file";
+      bodyFields.push({
+        key: field.key,
+        type: isFile ? "z.any()" : "z.string()",
+        description: field.description || `${field.key} ${isFile ? "(file)" : "field"}`,
+        required: false,
+      });
+    }
+  }
+
+  return bodyFields;
+}
+
+/**
+ * Infer Zod type from a JavaScript value
+ */
+function inferZodType(value: any): string {
+  if (value === null) return "z.any().nullable()";
+  if (typeof value === "string") return "z.string()";
+  if (typeof value === "number") {
+    return Number.isInteger(value) ? "z.number().int()" : "z.number()";
+  }
+  if (typeof value === "boolean") return "z.boolean()";
+  if (Array.isArray(value)) {
+    if (value.length > 0) {
+      const itemType = inferZodType(value[0]);
+      return `z.array(${itemType})`;
+    }
+    return "z.array(z.any())";
+  }
+  if (typeof value === "object") {
+    // For nested objects, just use z.object with z.any() for simplicity
+    // Could be made recursive for deeper typing
+    return "z.record(z.any())";
+  }
+  return "z.any()";
 }
 
 /**
@@ -230,6 +319,7 @@ export function postmanToLangChainCode(collection: any): string {
 
     const queryParams = extractQueryParams(request);
     const pathParams = extractPathParams(request);
+    const bodyFields = extractBodyFields(request);
 
     code += `  // ${request.name}\n`;
     code += `  const ${name} = tool(\n`;
@@ -314,8 +404,21 @@ export function postmanToLangChainCode(collection: any): string {
       }
     }
 
-    // Always allow a body for non-GET methods (and optional for GET)
-    code += `        body: z.any().optional().describe('Request body'),\n`;
+    // Add body fields for methods that use request bodies
+    if (method !== "GET" && method !== "HEAD") {
+      if (bodyFields.length > 0) {
+        // Generate typed body schema from Postman sample
+        code += `        body: z.object({\n`;
+        for (const field of bodyFields) {
+          const escapedDesc = field.description.replace(/'/g, "\\'");
+          code += `          '${field.key}': ${field.type}.optional().describe('${escapedDesc}'),\n`;
+        }
+        code += `        }).optional().describe('Request body'),\n`;
+      } else {
+        // Fallback to z.any() if no body sample found
+        code += `        body: z.any().optional().describe('Request body'),\n`;
+      }
+    }
 
     code += `      }),\n`;
     code += `    }\n`;
