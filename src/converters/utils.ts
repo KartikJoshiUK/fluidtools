@@ -293,7 +293,7 @@ export function postmanToLangChainCode(collection: any): string {
 
     // Skip requests with empty URLs
     if (!url || url.trim() === "") {
-      console.warn(`⚠️  Skipping request "${request.name}" - no URL provided`);
+      console.warn(`  Skipping request "${request.name}" - no URL provided`);
       continue;
     }
 
@@ -347,7 +347,7 @@ export function postmanToLangChainCode(collection: any): string {
     }
 
     // Log the exact request that will be sent
-    code += `        console.log('⤴ Request:', JSON.stringify({ method: '${method}', url, params, body: args.body ?? null }, null, 2));\n\n`;
+    code += `        console.log('Request:', JSON.stringify({ method: '${method}', url, params, body: args.body ?? null }, null, 2));\n\n`;
 
     // Axios call per method
     const lower = method.toLowerCase();
@@ -372,7 +372,7 @@ export function postmanToLangChainCode(collection: any): string {
     }
 
     // Log response
-    code += `        console.log('⤵ Response:', JSON.stringify(res.data, null, 2));\n`;
+    code += `        console.log('Response:', JSON.stringify(res.data, null, 2));\n`;
     code += `        return JSON.stringify(res.data, null, 2);\n`;
     code += `      } catch (err: any) {\n`;
     code += `        // More detailed error logging including response body if available\n`;

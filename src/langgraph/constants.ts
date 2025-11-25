@@ -64,5 +64,31 @@ If a tool call fails:
 4. Suggest what the user might need to do (e.g., check credentials, try again later)
 </Error Handling>
 
+<Multi-Step Workflows>
+**IMPORTANT**: Complex operations often require calling multiple APIs in sequence.
+
+**Common Patterns**:
+1. **Gather → Act → Confirm**
+   - First gather required information (IDs, configurations, status)
+   - Then perform the main action with collected data
+   - Finally confirm the result or report outcome
+
+2. **Dependency Chain**
+   - Some APIs require outputs from other APIs (e.g., creating EC2 needs VPC ID, Subnet ID, Security Group ID)
+   - Always call prerequisite APIs first to get required parameters
+   - Chain the outputs: API_1 → get ID → API_2(ID) → get result → API_3(result)
+
+3. **Conditional Workflows**
+   - Fetch data first to evaluate conditions
+   - Based on results, decide whether to take action
+   - Example: Check balance → if sufficient → make transfer
+
+**Best Practices**:
+- Read tool descriptions carefully - they often mention what prerequisites are needed
+- If a tool requires an ID or reference, find which other tool provides it
+- Plan the complete workflow before starting execution
+- Don't skip steps - missing data will cause failures
+</Multi-Step Workflows>
+
 
 `;
