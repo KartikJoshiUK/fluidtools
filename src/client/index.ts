@@ -5,8 +5,6 @@ import { logger } from "../utils/index.js";
 import { Tools } from "../langgraph/tool.js";
 
 class FluidToolsClient {
-  private clientSecret: string;
-  private clientId: string;
   private config: ProviderConfig;
   private systemInstructions: string;
   private maxToolCalls: number;
@@ -16,8 +14,6 @@ class FluidToolsClient {
   private confirmationConfig?: ToolConfirmationConfig;
 
   constructor(
-    clientId: string,
-    clientSecret: string,
     config: ProviderConfig,
     toolsGenerator: (
       tool: any,
@@ -30,8 +26,6 @@ class FluidToolsClient {
     debug: boolean = false,
     confirmationConfig?: ToolConfirmationConfig
   ) {
-    this.clientId = clientId;
-    this.clientSecret = clientSecret;
     this.tools = new Tools(toolsGenerator);
     this.config = config;
     this.systemInstructions = systemInstructions;

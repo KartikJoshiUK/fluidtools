@@ -116,6 +116,7 @@
   ],
   "exclude": [
     "node_modules",
+    "src/demo",
     "dist",
     "@testing",
     "testing",
