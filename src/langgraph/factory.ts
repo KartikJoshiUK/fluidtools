@@ -46,6 +46,21 @@ export function createProvider(config: ProviderConfig) {
         topP: config.topP,
       });
 
+    case "nebius":
+      return new ChatOpenAI({
+        model: config.model,
+        openAIApiKey: config.apiKey,
+        temperature: config.temperature,
+        maxTokens: config.maxTokens,
+        topP: config.topP,
+        configuration: {
+          baseURL: config.baseUrl || "https://api.studio.nebius.ai/v1/",
+          defaultHeaders: {
+            "Authorization": `Bearer ${config.apiKey}`,
+          },
+        },
+      });
+
     default:
       // This should never happen due to TypeScript's exhaustiveness checking
       throw new Error(`Unsupported provider type: ${(config as any).type}`);

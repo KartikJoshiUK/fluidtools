@@ -1,5 +1,6 @@
 import { MessagesAnnotation } from "@langchain/langgraph";
 import { Annotation } from "@langchain/langgraph";
+import { PendingToolCall } from "./types.js";
 
 /**
  * State for the FluidTools agent
@@ -12,13 +13,24 @@ import { Annotation } from "@langchain/langgraph";
  * - Proper TypeScript types
  * - Same behavior as Python's add_messages
  * 
- * We extend it with maxToolCalls for recursion control.
+ * We extend it with maxToolCalls for recursion control and
+ * pendingConfirmations for human-in-the-loop support.
  */
 const MessagesState = Annotation.Root({
   ...MessagesAnnotation.spec,
   maxToolCalls: Annotation<number>({
     reducer: (x, y) => y ?? x,
     default: () => 10,
+  }),
+  /** Tools waiting for human confirmation */
+  pendingConfirmations: Annotation<PendingToolCall[]>({
+    reducer: (x, y) => y ?? x,
+    default: () => [],
+  }),
+  /** Whether the graph is paused waiting for confirmation */
+  awaitingConfirmation: Annotation<boolean>({
+    reducer: (x, y) => y ?? x,
+    default: () => false,
   }),
 });
 

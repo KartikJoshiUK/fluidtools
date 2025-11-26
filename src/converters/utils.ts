@@ -21,6 +21,16 @@ export function flattenPostmanCollection(collection: any): PostmanRequest[] {
 }
 
 /**
+ * Helper to get raw URL string from request
+ */
+function getRawUrl(request: PostmanRequest): string {
+  if (typeof request.request.url === "string") {
+    return request.request.url;
+  }
+  return request.request.url?.raw || "";
+}
+
+/**
  * Extract query parameters from Postman request
  */
 function extractQueryParams(
@@ -61,7 +71,7 @@ function extractPathParams(
   request: PostmanRequest
 ): Array<{ key: string; description: string }> {
   const pathParams: Array<{ key: string; description: string }> = [];
-  const raw = request.request.url?.raw || "";
+  const raw = getRawUrl(request);
 
   // Remove protocol and host:port to avoid matching port numbers as params
   // e.g., "http://localhost:8000/users/:id" → "/users/:id"

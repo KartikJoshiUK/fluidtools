@@ -1,5 +1,5 @@
 import FluidTools from "../langgraph/index.js";
-import { ProviderConfig } from "../langgraph/types.js";
+import { ProviderConfig, ToolConfirmationConfig } from "../langgraph/types.js";
 import { DEFAULT_SYSTEM_INSTRUCTIONS } from "../langgraph/constants.js";
 import { logger } from "../utils/index.js";
 import { Tools } from "../langgraph/tool.js";
@@ -13,6 +13,7 @@ class FluidToolsClient {
   private fluidTool: FluidTools; // Reuse the same instance to preserve memory
   private debug: boolean;
   private tools: Tools;
+  private confirmationConfig?: ToolConfirmationConfig;
 
   constructor(
     clientId: string,
@@ -26,7 +27,8 @@ class FluidToolsClient {
     ) => Record<string, any>,
     systemInstructions: string = "",
     maxToolCalls: number = 10,
-    debug: boolean = false
+    debug: boolean = false,
+    confirmationConfig?: ToolConfirmationConfig
   ) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
@@ -34,13 +36,16 @@ class FluidToolsClient {
     this.config = config;
     this.systemInstructions = systemInstructions;
     this.maxToolCalls = maxToolCalls;
+    this.debug = debug;
+    this.confirmationConfig = confirmationConfig;
     this.fluidTool = new FluidTools(
       this.config,
       this.tools,
       this.getSystemInstructions(),
-      this.maxToolCalls
-    ); // Initialize with empty tools
-    this.debug = debug;
+      this.maxToolCalls,
+      this.debug,
+      this.confirmationConfig
+    );
   }
 
   private getSystemInstructions = () => {

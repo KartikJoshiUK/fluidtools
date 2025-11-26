@@ -4,7 +4,7 @@ import "dotenv/config";
 import { HumanMessage } from "@langchain/core/messages";
 import { createProvider } from "./factory.js";
 import getAgent from "./nodes.js";
-import { ProviderConfig } from "./types.js";
+import { ProviderConfig, ToolConfirmationConfig, PendingToolCall } from "./types.js";
 import { DEFAULT_SYSTEM_INSTRUCTIONS } from "./constants.js";
 import { logger } from "../utils/index.js";
 import { Tools } from "./tool.js";
@@ -17,26 +17,28 @@ class FluidTools {
   private debug: boolean;
   private systemInstructions: string;
   private tools: Tools;
+  private confirmationConfig?: ToolConfirmationConfig;
 
   constructor(
     config: ProviderConfig,
     tools: Tools,
     systemInstructions: string = DEFAULT_SYSTEM_INSTRUCTIONS,
     maxToolCalls: number = 10,
-    debug: boolean = false
+    debug: boolean = false,
+    confirmationConfig?: ToolConfirmationConfig
   ) {
     this.config = config;
     this.model = createProvider(this.config);
-    this.agent = getAgent(this.model, tools, systemInstructions);
+    this.confirmationConfig = confirmationConfig;
+    this.agent = getAgent(this.model, tools, systemInstructions, debug, confirmationConfig);
     this.maxToolCalls = maxToolCalls;
     this.debug = debug;
     this.systemInstructions = systemInstructions;
     this.tools = tools;
   }
 
-  public async query(query: string) {
-    const config = { configurable: { thread_id: "1" } };
-    this.agent = getAgent(this.model, this.tools, this.systemInstructions);
+  public async query(query: string, threadId: string = "1") {
+    const config = { configurable: { thread_id: threadId } };
 
     // Invoke with the new message - LangGraph will automatically merge with existing state
     const result = await this.agent.invoke(
@@ -54,25 +56,106 @@ class FluidTools {
    * Get the current conversation state from the checkpointer
    * @returns The current state including all messages
    */
-  public async getConversationState() {
-    const config = { configurable: { thread_id: "1" } };
+  public async getConversationState(threadId: string = "1") {
+    const config = { configurable: { thread_id: threadId } };
     const state = await this.agent.getState(config);
     return state;
   }
 
   /**
+   * Get any pending tool calls that need confirmation
+   * @returns Array of pending tool calls awaiting approval
+   */
+  public async getPendingConfirmations(threadId: string = "1"): Promise<PendingToolCall[]> {
+    const state = await this.getConversationState(threadId);
+    return state.values.pendingConfirmations || [];
+  }
+
+  /**
+   * Approve a pending tool call and continue execution
+   * @param toolCallId The ID of the tool call to approve
+   * @param threadId The thread ID (default: "1")
+   */
+  public async approveToolCall(toolCallId: string, threadId: string = "1") {
+    const config = { configurable: { thread_id: threadId } };
+    const state = await this.getConversationState(threadId);
+    
+    const pendingConfirmations: PendingToolCall[] = state.values.pendingConfirmations || [];
+    const approvedIndex = pendingConfirmations.findIndex(p => p.toolCallId === toolCallId);
+    
+    if (approvedIndex === -1) {
+      throw new Error(`No pending confirmation found for tool call ID: ${toolCallId}`);
+    }
+    
+    // Mark as approved
+    pendingConfirmations[approvedIndex].status = 'approved';
+    
+    // Update state and continue
+    const result = await this.agent.invoke(
+      {
+        pendingConfirmations,
+        awaitingConfirmation: pendingConfirmations.some(p => p.status === 'pending'),
+      },
+      config
+    );
+
+    return result;
+  }
+
+  /**
+   * Reject a pending tool call and continue execution
+   * @param toolCallId The ID of the tool call to reject
+   * @param threadId The thread ID (default: "1")
+   */
+  public async rejectToolCall(toolCallId: string, threadId: string = "1") {
+    const config = { configurable: { thread_id: threadId } };
+    const state = await this.getConversationState(threadId);
+    
+    const pendingConfirmations: PendingToolCall[] = state.values.pendingConfirmations || [];
+    const rejectedIndex = pendingConfirmations.findIndex(p => p.toolCallId === toolCallId);
+    
+    if (rejectedIndex === -1) {
+      throw new Error(`No pending confirmation found for tool call ID: ${toolCallId}`);
+    }
+    
+    // Mark as rejected
+    pendingConfirmations[rejectedIndex].status = 'rejected';
+    
+    // Update state and continue
+    const result = await this.agent.invoke(
+      {
+        pendingConfirmations,
+        awaitingConfirmation: pendingConfirmations.some(p => p.status === 'pending'),
+      },
+      config
+    );
+
+    return result;
+  }
+
+  /**
    * Print the conversation history to console in a readable format
    */
-  public async printConversationHistory() {
-    const state = await this.getConversationState();
+  public async printConversationHistory(threadId: string = "1") {
+    const state = await this.getConversationState(threadId);
     const messages = state.values.messages || [];
 
     logger(this.debug, "\n" + "=".repeat(80));
     logger(this.debug, "📚 CONVERSATION HISTORY");
     logger(this.debug, "=".repeat(80));
-    logger(this.debug, `Thread ID: 1`);
+    logger(this.debug, `Thread ID: ${threadId}`);
     logger(this.debug, `Total Messages: ${messages.length}`);
     logger(this.debug, `Max Tool Calls: ${state.values.maxToolCalls || "N/A"}`);
+    
+    // Show pending confirmations if any
+    const pending = state.values.pendingConfirmations || [];
+    if (pending.length > 0) {
+      logger(this.debug, `⏸️  Pending Confirmations: ${pending.length}`);
+      pending.forEach((p: PendingToolCall, i: number) => {
+        logger(this.debug, `   ${i + 1}. ${p.toolName} [${p.status}] - ${JSON.stringify(p.args)}`);
+      });
+    }
+    
     logger(this.debug, "=".repeat(80));
 
     messages.forEach((msg: any, index: number) => {

@@ -5,7 +5,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatOllama } from "@langchain/ollama";
 import { ChatOpenAI, ChatOpenAICallOptions } from "@langchain/openai";
 
-export type ProviderType = "ollama" | "openai" | "anthropic" | "gemini";
+export type ProviderType = "ollama" | "openai" | "anthropic" | "gemini" | "nebius";
 
 export interface BaseProviderConfig {
   type: ProviderType;
@@ -43,13 +43,38 @@ export interface GeminiConfig extends BaseProviderConfig {
   topP?: number;
 }
 
+export interface NebiusConfig extends BaseProviderConfig {
+  type: "nebius";
+  apiKey: string;
+  baseUrl?: string;
+  temperature?: number;
+  maxTokens?: number;
+  topP?: number;
+}
+
 export type ProviderConfig =
   | OllamaConfig
   | OpenAIConfig
   | AnthropicConfig
-  | GeminiConfig;
+  | GeminiConfig
+  | NebiusConfig;
 export type Model =
   | ChatOllama
   | ChatOpenAI<ChatOpenAICallOptions>
   | ChatAnthropic
   | ChatGoogleGenerativeAI;
+
+// Human-in-the-loop types
+export interface ToolConfirmationConfig {
+  /** Tool names that require human confirmation before execution */
+  requireConfirmation: string[];
+  /** Optional callback to handle confirmation - if not provided, will use interrupt */
+  onConfirmationRequired?: (toolName: string, args: any) => Promise<boolean>;
+}
+
+export interface PendingToolCall {
+  toolName: string;
+  toolCallId: string;
+  args: any;
+  status: 'pending' | 'approved' | 'rejected';
+}
