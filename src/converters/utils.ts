@@ -78,9 +78,9 @@ function extractPathParams(
   const pathOnly = raw.replace(/^[a-zA-Z]+:\/\/[^/]+/, "");
 
   // Match :param style (only in path, not port numbers)
-  const colonMatches = Array.from(pathOnly.matchAll(/:([A-Za-z_][A-Za-z0-9_]*)/g)).map(
-    (m) => m[1]
-  );
+  const colonMatches = Array.from(
+    pathOnly.matchAll(/:([A-Za-z_][A-Za-z0-9_]*)/g)
+  ).map((m) => m[1]);
   for (const k of colonMatches) {
     pathParams.push({ key: k, description: `${k} path parameter` });
   }
@@ -127,10 +127,18 @@ function extractPathParams(
  * Extract body fields from Postman request body (raw JSON mode)
  * Returns an array of field definitions with inferred types
  */
-function extractBodyFields(
-  request: PostmanRequest
-): Array<{ key: string; type: string; description: string; required: boolean }> {
-  const bodyFields: Array<{ key: string; type: string; description: string; required: boolean }> = [];
+function extractBodyFields(request: PostmanRequest): Array<{
+  key: string;
+  type: string;
+  description: string;
+  required: boolean;
+}> {
+  const bodyFields: Array<{
+    key: string;
+    type: string;
+    description: string;
+    required: boolean;
+  }> = [];
 
   const body = (request.request as any).body;
   if (!body) return bodyFields;
@@ -139,7 +147,11 @@ function extractBodyFields(
   if (body.mode === "raw" && body.raw) {
     try {
       const parsed = JSON.parse(body.raw);
-      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
+      if (
+        typeof parsed === "object" &&
+        parsed !== null &&
+        !Array.isArray(parsed)
+      ) {
         for (const [key, value] of Object.entries(parsed)) {
           const zodType = inferZodType(value);
           bodyFields.push({
@@ -174,7 +186,8 @@ function extractBodyFields(
       bodyFields.push({
         key: field.key,
         type: isFile ? "z.any()" : "z.string()",
-        description: field.description || `${field.key} ${isFile ? "(file)" : "field"}`,
+        description:
+          field.description || `${field.key} ${isFile ? "(file)" : "field"}`,
         required: false,
       });
     }
@@ -292,7 +305,7 @@ export function postmanToLangChainCode(collection: any): string {
 
   let code = `// Generated LangChain tools from Postman collection\n`;
   code += `// Collection: ${collection.info?.name || "Unknown"}\n\n`;
-  code += `export function generateTools(tool: any, z: any, axios: any, authToken?: string) {\n`;
+  code += `export function generateTools(tool: any, z: any, axios: any, debug?: boolean) {\n`;
   code += `  const tools: Record<string, any> = {};\n\n`;
 
   const usedNames = new Set<string>();
@@ -357,41 +370,41 @@ export function postmanToLangChainCode(collection: any): string {
     }
 
     // Log the exact request that will be sent
-    code += `        console.log('Request:', JSON.stringify({ method: '${method}', url, params, body: args.body ?? null }, null, 2));\n\n`;
+    code += `        if(debug) console.log('Request:', JSON.stringify({ method: '${method}', url, params, body: args.body ?? null }, null, 2));\n\n`;
 
     // Axios call per method
     const lower = method.toLowerCase();
     if (method === "GET" || method === "HEAD") {
       code += `        const res = await axios.${lower}(url, {\n`;
       code += `          params,\n`;
-      code += `          headers: authToken ? { Authorization: \`Bearer \${authToken}\` } : {},\n`;
+      code += `          headers: args.authToken ? { Authorization: \`Bearer \${args.authToken}\` } : {},\n`;
       code += `        });\n`;
     } else if (method === "DELETE") {
       // axios.delete(url, { params, data, headers })
       code += `        const res = await axios.delete(url, {\n`;
       code += `          params,\n`;
       code += `          data: args.body ?? {},\n`;
-      code += `          headers: authToken ? { Authorization: \`Bearer \${authToken}\` } : {},\n`;
+      code += `          headers: args.authToken ? { Authorization: \`Bearer \${args.authToken}\` } : {},\n`;
       code += `        });\n`;
     } else {
       // POST, PUT, PATCH, etc. axios.post(url, data, { params, headers })
       code += `        const res = await axios.${lower}(url, args.body ?? {}, {\n`;
       code += `          params,\n`;
-      code += `          headers: authToken ? { Authorization: \`Bearer \${authToken}\` } : {},\n`;
+      code += `          headers: args.authToken ? { Authorization: \`Bearer \${args.authToken}\` } : {},\n`;
       code += `        });\n`;
     }
 
     // Log response
-    code += `        console.log('Response:', JSON.stringify(res.data, null, 2));\n`;
+    code += `        if(debug) console.log('Response:', JSON.stringify(res.data, null, 2));\n`;
     code += `        return JSON.stringify(res.data, null, 2);\n`;
     code += `      } catch (err: any) {\n`;
     code += `        // More detailed error logging including response body if available\n`;
     code += `        if (err.response) {\n`;
-    code += `          console.log('🚨 API ERROR STATUS:', err.response.status);\n`;
-    code += `          console.log('🚨 API ERROR BODY:', JSON.stringify(err.response.data, null, 2));\n`;
+    code += `          if(debug) console.log('🚨 API ERROR STATUS:', err.response.status);\n`;
+    code += `          if(debug) console.log('🚨 API ERROR BODY:', JSON.stringify(err.response.data, null, 2));\n`;
     code += `          return \`Error: \${err.message} - Status: \${err.response.status}\\n\${JSON.stringify(err.response.data, null, 2)}\`;\n`;
     code += `        }\n`;
-    code += `        console.log('🚨 API ERROR', err.message || err);\n`;
+    code += `        if(debug) console.log('🚨 API ERROR', err.message || err);\n`;
     code += `        return \`Error: \${err.message || err}\`;\n`;
     code += `      }\n`;
     code += `    },\n`;
@@ -399,6 +412,7 @@ export function postmanToLangChainCode(collection: any): string {
     code += `      name: '${name}',\n`;
     code += `      description: '${description}',\n`;
     code += `      schema: z.object({\n`;
+    code += `        authToken: z.string().optional().describe('Authorization token'),\n`;
 
     // Add query parameters as individual fields
     if (queryParams.length > 0) {

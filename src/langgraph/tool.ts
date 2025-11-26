@@ -7,7 +7,7 @@ export class Tools {
     tool: any,
     schemaBuilder: any,
     axios: any,
-    token?: string
+    debug?: boolean
   ) => Record<string, any>;
   private accessToken?: string;
   constructor(
@@ -15,14 +15,15 @@ export class Tools {
       tool: any,
       schemaBuilder: any,
       axios: any,
-      token?: string
-    ) => Record<string, any>
+      debug?: boolean
+    ) => Record<string, any>,
+    debug?: boolean
   ) {
     this.toolsGenerator = toolsGenerator;
   }
 
-  public getToolByName() {
-    return this.toolsGenerator(tool, z, axios, this.accessToken);
+  public getToolByName(debug?: boolean) {
+    return this.toolsGenerator(tool, z, axios, debug);
   }
 
   set AccessToken(token: string) {

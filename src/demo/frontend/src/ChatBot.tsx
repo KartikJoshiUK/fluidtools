@@ -392,7 +392,7 @@ export default function ChatBot() {
     try {
       const response = await axios.get("http://localhost:3000/", {
         params: {
-          query: JSON.stringify({ context: baseMessages, query: userText }),
+          query: userText,
         },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -419,6 +419,21 @@ export default function ChatBot() {
     } finally {
       setIsProcessing(false);
       abortCtrlRef.current = null;
+    }
+  };
+
+  const handleResetChat = async () => {
+    try {
+      await axios.delete("http://localhost:3000", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+    } catch (err) {
+    } finally {
+      setMessages([
+        { text: "Hello! How can I help you today?", sender: "bot" },
+      ]);
     }
   };
 
@@ -496,11 +511,9 @@ export default function ChatBot() {
         <div className="flex items-center gap-3 bg-white rounded-full px-3 py-2 border border-gray-300">
           <button
             type="button"
-            onClick={() =>
-              setMessages([
-                { text: "Hello! How can I help you today?", sender: "bot" },
-              ])
-            }
+            onClick={async () => {
+              await handleResetChat();
+            }}
             className="p-2 hover:bg-gray-200 rounded-full"
           >
             <FiRotateCw size={18} />

@@ -3,6 +3,7 @@ import { ProviderConfig, ToolConfirmationConfig } from "../langgraph/types.js";
 import { DEFAULT_SYSTEM_INSTRUCTIONS } from "../langgraph/constants.js";
 import { logger } from "../utils/index.js";
 import { Tools } from "../langgraph/tool.js";
+import { v4 as uuidv4 } from "uuid";
 
 class FluidToolsClient {
   private config: ProviderConfig;
@@ -12,22 +13,26 @@ class FluidToolsClient {
   private debug: boolean;
   private tools: Tools;
   private confirmationConfig?: ToolConfirmationConfig;
+  private sessionMap: Map<string, { threadId: string; expiry: number }> =
+    new Map();
+  private expireAfterSeconds: number;
 
   constructor(
     config: ProviderConfig,
     toolsGenerator: (
       tool: any,
       schemaBuilder: any,
-      axios: any,
-      token?: string
+      axios: any
     ) => Record<string, any>,
     systemInstructions: string = "",
     maxToolCalls: number = 10,
     debug: boolean = false,
+    expireAfterSeconds: number = 24 * 60 * 60,
     confirmationConfig?: ToolConfirmationConfig
   ) {
     this.tools = new Tools(toolsGenerator);
     this.config = config;
+    this.expireAfterSeconds = expireAfterSeconds;
     this.systemInstructions = systemInstructions;
     this.maxToolCalls = maxToolCalls;
     this.debug = debug;
@@ -73,11 +78,48 @@ class FluidToolsClient {
     return prompt;
   };
 
+  public async clearThread(accessToken: string) {
+    const threadId = this.getThreadId(accessToken);
+    this.sessionMap.delete(accessToken);
+    if (threadId) await this.fluidTool.clearThreadMemory(threadId);
+  }
+
+  private getThreadId(accessToken?: string) {
+    if (accessToken) {
+      const now = Date.now();
+      const existingSession = this.sessionMap.get(accessToken);
+      if (existingSession) {
+        if (existingSession.expiry < now) {
+          this.fluidTool.clearThreadMemory(existingSession.threadId);
+          this.sessionMap.delete(accessToken);
+        } else {
+          this.sessionMap.set(accessToken, {
+            threadId: existingSession.threadId,
+            expiry: now + this.expireAfterSeconds,
+          });
+        }
+      } else {
+        this.sessionMap.set(accessToken, {
+          threadId: uuidv4(),
+          expiry: now + this.expireAfterSeconds,
+        });
+      }
+    }
+
+    const threadId = accessToken
+      ? this.sessionMap.get(accessToken)?.threadId
+      : "";
+
+    return threadId;
+  }
+
   public async query(query: string, accessToken?: string) {
     logger(this.debug, "\n🎯 [FluidToolsClient.query] Query received:", query);
-    // Reuse the same FluidTools instance to preserve conversation history
+
     if (accessToken) this.tools.AccessToken = accessToken;
-    const response = await this.fluidTool.query(query);
+    const threadId = this.getThreadId(accessToken);
+
+    const response = await this.fluidTool.query(query, threadId);
 
     logger(
       this.debug,
@@ -91,20 +133,6 @@ class FluidToolsClient {
     );
 
     return response.messages.at(-1)?.content;
-  }
-
-  /**
-   * Get the current conversation state
-   */
-  public async getConversationState() {
-    return await this.fluidTool.getConversationState();
-  }
-
-  /**
-   * Print the full conversation history to console
-   */
-  public async printConversationHistory() {
-    await this.fluidTool.printConversationHistory();
   }
 }
 

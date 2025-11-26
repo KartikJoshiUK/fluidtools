@@ -4,10 +4,15 @@ import "dotenv/config";
 import { HumanMessage } from "@langchain/core/messages";
 import { createProvider } from "./factory.js";
 import getAgent from "./nodes.js";
-import { ProviderConfig, ToolConfirmationConfig, PendingToolCall } from "./types.js";
+import {
+  ProviderConfig,
+  ToolConfirmationConfig,
+  PendingToolCall,
+} from "./types.js";
 import { DEFAULT_SYSTEM_INSTRUCTIONS } from "./constants.js";
 import { logger } from "../utils/index.js";
 import { Tools } from "./tool.js";
+import { MemorySaver } from "@langchain/langgraph";
 
 class FluidTools {
   private model;
@@ -15,9 +20,8 @@ class FluidTools {
   private maxToolCalls: number;
   private config: ProviderConfig;
   private debug: boolean;
-  private systemInstructions: string;
   private tools: Tools;
-  private confirmationConfig?: ToolConfirmationConfig;
+  private memory: MemorySaver;
 
   constructor(
     config: ProviderConfig,
@@ -29,11 +33,17 @@ class FluidTools {
   ) {
     this.config = config;
     this.model = createProvider(this.config);
-    this.confirmationConfig = confirmationConfig;
-    this.agent = getAgent(this.model, tools, systemInstructions, debug, confirmationConfig);
+    this.memory = new MemorySaver();
+    this.agent = getAgent(
+      this.model,
+      tools,
+      this.memory,
+      systemInstructions,
+      debug,
+      confirmationConfig
+    );
     this.maxToolCalls = maxToolCalls;
     this.debug = debug;
-    this.systemInstructions = systemInstructions;
     this.tools = tools;
   }
 
@@ -45,6 +55,7 @@ class FluidTools {
       {
         messages: [new HumanMessage(query)],
         maxToolCalls: this.maxToolCalls,
+        authToken: this.tools.AccessToken,
       },
       config
     );
@@ -66,7 +77,9 @@ class FluidTools {
    * Get any pending tool calls that need confirmation
    * @returns Array of pending tool calls awaiting approval
    */
-  public async getPendingConfirmations(threadId: string = "1"): Promise<PendingToolCall[]> {
+  public async getPendingConfirmations(
+    threadId: string = "1"
+  ): Promise<PendingToolCall[]> {
     const state = await this.getConversationState(threadId);
     return state.values.pendingConfirmations || [];
   }
@@ -79,22 +92,29 @@ class FluidTools {
   public async approveToolCall(toolCallId: string, threadId: string = "1") {
     const config = { configurable: { thread_id: threadId } };
     const state = await this.getConversationState(threadId);
-    
-    const pendingConfirmations: PendingToolCall[] = state.values.pendingConfirmations || [];
-    const approvedIndex = pendingConfirmations.findIndex(p => p.toolCallId === toolCallId);
-    
+
+    const pendingConfirmations: PendingToolCall[] =
+      state.values.pendingConfirmations || [];
+    const approvedIndex = pendingConfirmations.findIndex(
+      (p) => p.toolCallId === toolCallId
+    );
+
     if (approvedIndex === -1) {
-      throw new Error(`No pending confirmation found for tool call ID: ${toolCallId}`);
+      throw new Error(
+        `No pending confirmation found for tool call ID: ${toolCallId}`
+      );
     }
-    
+
     // Mark as approved
-    pendingConfirmations[approvedIndex].status = 'approved';
-    
+    pendingConfirmations[approvedIndex].status = "approved";
+
     // Update state and continue
     const result = await this.agent.invoke(
       {
         pendingConfirmations,
-        awaitingConfirmation: pendingConfirmations.some(p => p.status === 'pending'),
+        awaitingConfirmation: pendingConfirmations.some(
+          (p) => p.status === "pending"
+        ),
       },
       config
     );
@@ -110,22 +130,29 @@ class FluidTools {
   public async rejectToolCall(toolCallId: string, threadId: string = "1") {
     const config = { configurable: { thread_id: threadId } };
     const state = await this.getConversationState(threadId);
-    
-    const pendingConfirmations: PendingToolCall[] = state.values.pendingConfirmations || [];
-    const rejectedIndex = pendingConfirmations.findIndex(p => p.toolCallId === toolCallId);
-    
+
+    const pendingConfirmations: PendingToolCall[] =
+      state.values.pendingConfirmations || [];
+    const rejectedIndex = pendingConfirmations.findIndex(
+      (p) => p.toolCallId === toolCallId
+    );
+
     if (rejectedIndex === -1) {
-      throw new Error(`No pending confirmation found for tool call ID: ${toolCallId}`);
+      throw new Error(
+        `No pending confirmation found for tool call ID: ${toolCallId}`
+      );
     }
-    
+
     // Mark as rejected
-    pendingConfirmations[rejectedIndex].status = 'rejected';
-    
+    pendingConfirmations[rejectedIndex].status = "rejected";
+
     // Update state and continue
     const result = await this.agent.invoke(
       {
         pendingConfirmations,
-        awaitingConfirmation: pendingConfirmations.some(p => p.status === 'pending'),
+        awaitingConfirmation: pendingConfirmations.some(
+          (p) => p.status === "pending"
+        ),
       },
       config
     );
@@ -146,16 +173,19 @@ class FluidTools {
     logger(this.debug, `Thread ID: ${threadId}`);
     logger(this.debug, `Total Messages: ${messages.length}`);
     logger(this.debug, `Max Tool Calls: ${state.values.maxToolCalls || "N/A"}`);
-    
+
     // Show pending confirmations if any
     const pending = state.values.pendingConfirmations || [];
     if (pending.length > 0) {
       logger(this.debug, `⏸️  Pending Confirmations: ${pending.length}`);
       pending.forEach((p: PendingToolCall, i: number) => {
-        logger(this.debug, `   ${i + 1}. ${p.toolName} [${p.status}] - ${JSON.stringify(p.args)}`);
+        logger(
+          this.debug,
+          `   ${i + 1}. ${p.toolName} [${p.status}] - ${JSON.stringify(p.args)}`
+        );
       });
     }
-    
+
     logger(this.debug, "=".repeat(80));
 
     messages.forEach((msg: any, index: number) => {
@@ -214,6 +244,10 @@ class FluidTools {
 
     logger(this.debug, "\n" + "=".repeat(80));
     logger(this.debug, "✅ End of conversation history\n");
+  }
+
+  public async clearThreadMemory(threadId: string) {
+    await this.memory.deleteThread(threadId);
   }
 }
 

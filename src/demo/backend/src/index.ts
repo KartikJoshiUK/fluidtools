@@ -58,6 +58,19 @@ app.get("/", async (req: Request, res: Response) => {
   });
 });
 
+app.delete("/", async (req: Request, res: Response) => {
+  const { authorization } = req.headers;
+
+  const accessToken = authorization?.split(" ")[1];
+  if (accessToken) {
+    await fluidtools.clearThread(accessToken);
+  }
+
+  res.status(204).send({
+    message: "Thread cleared",
+  });
+});
+
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

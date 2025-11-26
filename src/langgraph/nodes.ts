@@ -1,4 +1,10 @@
-import { AIMessage, BaseMessage, SystemMessage, ToolMessage } from "langchain";
+import {
+  AIMessage,
+  BaseMessage,
+  SystemMessage,
+  Tool,
+  ToolMessage,
+} from "langchain";
 import MessagesState from "./state.js";
 import { END, MemorySaver, START, StateGraph } from "@langchain/langgraph";
 import { Model, ToolConfirmationConfig, PendingToolCall } from "./types.js";
@@ -9,17 +15,20 @@ import { Tools } from "./tool.js";
 const getAgent = (
   model: Model,
   toolObj: Tools,
+  memory: MemorySaver,
   systemInstructions: string = DEFAULT_SYSTEM_INSTRUCTIONS,
   debug: boolean = false,
   confirmationConfig?: ToolConfirmationConfig
 ) => {
-  const toolsByName = toolObj.getToolByName();
+  const toolsByName = toolObj.getToolByName(false);
   const tools = Object.values(toolsByName);
   const modelWithTools = model.bindTools(tools);
   const systemMessage = new SystemMessage(systemInstructions);
-  
+
   // Tools that require human confirmation
-  const requiresConfirmation = new Set(confirmationConfig?.requireConfirmation || []);
+  const requiresConfirmation = new Set(
+    confirmationConfig?.requireConfirmation || []
+  );
 
   async function llmCall(state: typeof MessagesState.State) {
     logger(debug, "\n🔍 [llmCall] Current state:", {
@@ -46,7 +55,11 @@ const getAgent = (
     const lastMessage = state.messages.at(-1);
     if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
       logger(debug, "⚠️  [toolNode] No valid AI message found");
-      return { messages: [], pendingConfirmations: [], awaitingConfirmation: false };
+      return {
+        messages: [],
+        pendingConfirmations: [],
+        awaitingConfirmation: false,
+      };
     }
 
     const result: ToolMessage[] = [];
@@ -54,20 +67,26 @@ const getAgent = (
 
     for (const toolCall of lastMessage.tool_calls ?? []) {
       logger(debug, `🛠️  [toolNode] Checking tool: ${toolCall.name}`);
-      
+
       // Check if this tool requires confirmation
       if (requiresConfirmation.has(toolCall.name)) {
-        logger(debug, `⚠️  [toolNode] Tool ${toolCall.name} requires confirmation!`);
-        
+        logger(
+          debug,
+          `⚠️  [toolNode] Tool ${toolCall.name} requires confirmation!`
+        );
+
         // If we have a callback, use it
         if (confirmationConfig?.onConfirmationRequired) {
           const approved = await confirmationConfig.onConfirmationRequired(
             toolCall.name,
             toolCall.args
           );
-          
+
           if (!approved) {
-            logger(debug, `❌ [toolNode] Tool ${toolCall.name} was rejected by user`);
+            logger(
+              debug,
+              `❌ [toolNode] Tool ${toolCall.name} was rejected by user`
+            );
             result.push(
               new ToolMessage({
                 tool_call_id: toolCall.id!,
@@ -77,29 +96,38 @@ const getAgent = (
             );
             continue;
           }
-          logger(debug, `✅ [toolNode] Tool ${toolCall.name} was approved by user`);
+          logger(
+            debug,
+            `✅ [toolNode] Tool ${toolCall.name} was approved by user`
+          );
         } else {
           // No callback - add to pending and pause
           pendingConfirmations.push({
             toolName: toolCall.name,
             toolCallId: toolCall.id!,
             args: toolCall.args,
-            status: 'pending',
+            status: "pending",
           });
           continue;
         }
       }
 
       // Execute the tool
-      const tool = toolsByName[toolCall.name];
-      const observation = await tool.invoke(toolCall);
+      const tool: Tool = toolsByName[toolCall.name];
+      const observation = await tool.invoke({
+        ...toolCall.args,
+        authToken: state.authToken,
+      });
       result.push(observation);
       logger(debug, `✅ [toolNode] Tool ${toolCall.name} completed`);
     }
 
     // If we have pending confirmations, pause the graph
     if (pendingConfirmations.length > 0) {
-      logger(debug, `⏸️  [toolNode] Pausing for ${pendingConfirmations.length} confirmations`);
+      logger(
+        debug,
+        `⏸️  [toolNode] Pausing for ${pendingConfirmations.length} confirmations`
+      );
       return {
         messages: result,
         pendingConfirmations,
@@ -108,17 +136,24 @@ const getAgent = (
     }
 
     logger(debug, `📦 [toolNode] Returning ${result.length} tool messages`);
-    return { messages: result, pendingConfirmations: [], awaitingConfirmation: false };
+    return {
+      messages: result,
+      pendingConfirmations: [],
+      awaitingConfirmation: false,
+    };
   }
   async function shouldContinue(state: typeof MessagesState.State) {
     logger(debug, "\n🤔 [shouldContinue] Deciding next step...");
-    
+
     // If awaiting confirmation, pause the graph
     if (state.awaitingConfirmation) {
-      logger(debug, "⏸️  [shouldContinue] Awaiting human confirmation, pausing...");
+      logger(
+        debug,
+        "⏸️  [shouldContinue] Awaiting human confirmation, pausing..."
+      );
       return "awaitConfirmation";
     }
-    
+
     const lastMessage = state.messages.at(-1);
     if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
       logger(debug, "🛑 [shouldContinue] No AI message, ending");
@@ -157,16 +192,17 @@ const getAgent = (
     logger(debug, "🏁 [shouldContinue] No more tool calls, ending");
     return END;
   }
-  
+
   // Node that pauses for human confirmation
   async function awaitConfirmationNode(state: typeof MessagesState.State) {
-    logger(debug, "\n⏸️  [awaitConfirmation] Graph paused for human confirmation");
+    logger(
+      debug,
+      "\n⏸️  [awaitConfirmation] Graph paused for human confirmation"
+    );
     logger(debug, "Pending confirmations:", state.pendingConfirmations);
-  
+
     return {};
   }
-
-  const checkpointer = new MemorySaver();
 
   if (confirmationConfig?.requireConfirmation?.length) {
     // Graph with human-in-the-loop confirmation
@@ -175,19 +211,27 @@ const getAgent = (
       .addNode("toolNode", toolNode)
       .addNode("awaitConfirmation", awaitConfirmationNode)
       .addEdge(START, "llmCall")
-      .addConditionalEdges("llmCall", shouldContinue, ["toolNode", "awaitConfirmation", END])
-      .addConditionalEdges("toolNode", (state) => {
-        if (state.awaitingConfirmation) {
-          return "awaitConfirmation";
-        }
-        return "llmCall";
-      }, ["awaitConfirmation", "llmCall"])
+      .addConditionalEdges("llmCall", shouldContinue, [
+        "toolNode",
+        "awaitConfirmation",
+        END,
+      ])
+      .addConditionalEdges(
+        "toolNode",
+        (state) => {
+          if (state.awaitingConfirmation) {
+            return "awaitConfirmation";
+          }
+          return "llmCall";
+        },
+        ["awaitConfirmation", "llmCall"]
+      )
       .addEdge("awaitConfirmation", "toolNode")
-      .compile({ 
-        checkpointer,
-        interruptBefore: ["awaitConfirmation"]
+      .compile({
+        checkpointer: memory,
+        interruptBefore: ["awaitConfirmation"],
       });
-    
+
     return agent;
   } else {
     // Standard flow without confirmation
@@ -197,8 +241,8 @@ const getAgent = (
       .addEdge(START, "llmCall")
       .addConditionalEdges("llmCall", shouldContinue, ["toolNode", END])
       .addEdge("toolNode", "llmCall")
-      .compile({ checkpointer });
-    
+      .compile({ checkpointer: memory });
+
     return agent;
   }
 };
