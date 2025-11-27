@@ -68,8 +68,6 @@ export type Model =
 export interface ToolConfirmationConfig {
   /** Tool names that require human confirmation before execution */
   requireConfirmation: string[];
-  /** Optional callback to handle confirmation - if not provided, will use interrupt */
-  onConfirmationRequired?: (toolName: string, args: any) => Promise<boolean>;
 }
 
 export interface PendingToolCall {

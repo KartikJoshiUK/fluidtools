@@ -75,13 +75,15 @@ class FluidTools {
 
   /**
    * Get any pending tool calls that need confirmation
-   * @returns Array of pending tool calls awaiting approval
+   * @returns Array of pending tool calls awaiting approval (only status='pending')
    */
   public async getPendingConfirmations(
     threadId: string = "1"
   ): Promise<PendingToolCall[]> {
     const state = await this.getConversationState(threadId);
-    return state.values.pendingConfirmations || [];
+    const allPending = state.values.pendingConfirmations || [];
+    // Only return those that are still pending (not approved/rejected)
+    return allPending.filter((p: PendingToolCall) => p.status === 'pending');
   }
 
   /**
@@ -142,11 +144,7 @@ class FluidTools {
         `No pending confirmation found for tool call ID: ${toolCallId}`
       );
     }
-
-    // Mark as rejected
-    pendingConfirmations[rejectedIndex].status = "rejected";
-
-    // Update state and continue
+    pendingConfirmations[rejectedIndex].status = 'rejected';
     const result = await this.agent.invoke(
       {
         pendingConfirmations,

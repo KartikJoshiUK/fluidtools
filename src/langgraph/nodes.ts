@@ -63,53 +63,57 @@ const getAgent = (
     }
 
     const result: ToolMessage[] = [];
-    const pendingConfirmations: PendingToolCall[] = [];
+    const newPendingConfirmations: PendingToolCall[] = [];
+    
+    // Get existing pending confirmations from state (for resume scenario)
+    const existingPending = state.pendingConfirmations || [];
+    const pendingByToolCallId = new Map(
+      existingPending.map(p => [p.toolCallId, p])
+    );
 
     for (const toolCall of lastMessage.tool_calls ?? []) {
       logger(debug, `🛠️  [toolNode] Checking tool: ${toolCall.name}`);
-
-      // Check if this tool requires confirmation
-      if (requiresConfirmation.has(toolCall.name)) {
-        logger(
-          debug,
-          `⚠️  [toolNode] Tool ${toolCall.name} requires confirmation!`
-        );
-
-        // If we have a callback, use it
-        if (confirmationConfig?.onConfirmationRequired) {
-          const approved = await confirmationConfig.onConfirmationRequired(
-            toolCall.name,
-            toolCall.args
+      
+      const existingConfirmation = pendingByToolCallId.get(toolCall.id!);
+      
+      if (existingConfirmation) {
+        logger(debug, `🔄 [toolNode] Found existing confirmation for ${toolCall.name}: ${existingConfirmation.status}`);
+        
+        if (existingConfirmation.status === 'approved') {
+          // Tool was approved - execute it now
+          logger(debug, `✅ [toolNode] Tool ${toolCall.name} was approved, executing...`);
+          const tool = toolsByName[toolCall.name];
+          const observation = await tool.invoke(toolCall);
+          result.push(observation);
+          logger(debug, `✅ [toolNode] Tool ${toolCall.name} completed`);
+          continue;
+        } else if (existingConfirmation.status === 'rejected') {
+          // Tool was rejected - add rejection message
+          logger(debug, `❌ [toolNode] Tool ${toolCall.name} was rejected by user`);
+          result.push(
+            new ToolMessage({
+              tool_call_id: toolCall.id!,
+              name: toolCall.name,
+              content: `Action "${toolCall.name}" was cancelled by user.`,
+            })
           );
-
-          if (!approved) {
-            logger(
-              debug,
-              `❌ [toolNode] Tool ${toolCall.name} was rejected by user`
-            );
-            result.push(
-              new ToolMessage({
-                tool_call_id: toolCall.id!,
-                name: toolCall.name,
-                content: `Action "${toolCall.name}" was cancelled by user.`,
-              })
-            );
-            continue;
-          }
-          logger(
-            debug,
-            `✅ [toolNode] Tool ${toolCall.name} was approved by user`
-          );
-        } else {
-          // No callback - add to pending and pause
-          pendingConfirmations.push({
-            toolName: toolCall.name,
-            toolCallId: toolCall.id!,
-            args: toolCall.args,
-            status: "pending",
-          });
           continue;
         }
+        // If still 'pending', fall through to normal processing
+      }
+      
+      // Check if this tool requires confirmation
+      if (requiresConfirmation.has(toolCall.name)) {
+        logger(debug, `⚠️  [toolNode] Tool ${toolCall.name} requires confirmation!`);
+        
+        // Add to pending and pause for human confirmation
+        newPendingConfirmations.push({
+          toolName: toolCall.name,
+          toolCallId: toolCall.id!,
+          args: toolCall.args,
+          status: 'pending',
+        });
+        continue;
       }
 
       // Execute the tool
@@ -122,15 +126,12 @@ const getAgent = (
       logger(debug, `✅ [toolNode] Tool ${toolCall.name} completed`);
     }
 
-    // If we have pending confirmations, pause the graph
-    if (pendingConfirmations.length > 0) {
-      logger(
-        debug,
-        `⏸️  [toolNode] Pausing for ${pendingConfirmations.length} confirmations`
-      );
+    // If we have NEW pending confirmations, pause the graph
+    if (newPendingConfirmations.length > 0) {
+      logger(debug, `⏸️  [toolNode] Pausing for ${newPendingConfirmations.length} confirmations`);
       return {
         messages: result,
-        pendingConfirmations,
+        pendingConfirmations: newPendingConfirmations,
         awaitingConfirmation: true,
       };
     }
@@ -144,16 +145,7 @@ const getAgent = (
   }
   async function shouldContinue(state: typeof MessagesState.State) {
     logger(debug, "\n🤔 [shouldContinue] Deciding next step...");
-
-    // If awaiting confirmation, pause the graph
-    if (state.awaitingConfirmation) {
-      logger(
-        debug,
-        "⏸️  [shouldContinue] Awaiting human confirmation, pausing..."
-      );
-      return "awaitConfirmation";
-    }
-
+    
     const lastMessage = state.messages.at(-1);
     if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
       logger(debug, "🛑 [shouldContinue] No AI message, ending");

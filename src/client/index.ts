@@ -134,6 +134,45 @@ class FluidToolsClient {
 
     return response.messages.at(-1)?.content;
   }
+
+  /**
+   * Get the current conversation state
+   */
+  public async getConversationState() {
+    return await this.fluidTool.getConversationState();
+  }
+
+  /**
+   * Get any pending tool calls that need confirmation
+   */
+  public async getPendingConfirmations() {
+    return await this.fluidTool.getPendingConfirmations();
+  }
+
+  /**
+   * Approve a pending tool call and continue execution
+   * @param toolCallId The ID of the tool call to approve
+   */
+  public async approveToolCall(toolCallId: string) {
+    const result = await this.fluidTool.approveToolCall(toolCallId);
+    return result.messages.at(-1)?.content;
+  }
+
+  /**
+   * Reject a pending tool call and continue execution
+   * @param toolCallId The ID of the tool call to reject
+   */
+  public async rejectToolCall(toolCallId: string) {
+    const result = await this.fluidTool.rejectToolCall(toolCallId);
+    return result.messages.at(-1)?.content;
+  }
+
+  /**
+   * Print the full conversation history to console
+   */
+  public async printConversationHistory() {
+    await this.fluidTool.printConversationHistory();
+  }
 }
 
 export default FluidToolsClient;
