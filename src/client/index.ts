@@ -138,23 +138,26 @@ class FluidToolsClient {
   /**
    * Get the current conversation state
    */
-  public async getConversationState() {
-    return await this.fluidTool.getConversationState();
+  public async getConversationState(accessToken?: string) {
+    const threadId = this.getThreadId(accessToken);
+    return await this.fluidTool.getConversationState(threadId);
   }
 
   /**
    * Get any pending tool calls that need confirmation
    */
-  public async getPendingConfirmations() {
-    return await this.fluidTool.getPendingConfirmations();
+  public async getPendingConfirmations(accessToken?: string) {
+    const threadId = this.getThreadId(accessToken);
+    return await this.fluidTool.getPendingConfirmations(threadId);
   }
 
   /**
    * Approve a pending tool call and continue execution
    * @param toolCallId The ID of the tool call to approve
    */
-  public async approveToolCall(toolCallId: string) {
-    const result = await this.fluidTool.approveToolCall(toolCallId);
+  public async approveToolCall(toolCallId: string, accessToken?: string) {
+    const threadId = this.getThreadId(accessToken);
+    const result = await this.fluidTool.approveToolCall(toolCallId, threadId);
     return result.messages.at(-1)?.content;
   }
 
@@ -162,8 +165,9 @@ class FluidToolsClient {
    * Reject a pending tool call and continue execution
    * @param toolCallId The ID of the tool call to reject
    */
-  public async rejectToolCall(toolCallId: string) {
-    const result = await this.fluidTool.rejectToolCall(toolCallId);
+  public async rejectToolCall(toolCallId: string, accessToken?: string) {
+    const threadId = this.getThreadId(accessToken);
+    const result = await this.fluidTool.rejectToolCall(toolCallId, threadId);
     return result.messages.at(-1)?.content;
   }
 

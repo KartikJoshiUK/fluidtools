@@ -343,7 +343,7 @@ function STTControl({
 export default function ChatBot() {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<
-    { text: string; sender: "user" | "bot" }[]
+    { text: string; sender: "user" | "bot"; approvalButtons?: string[] }[]
   >([{ text: "Hello! How can I assist you today?", sender: "bot" }]);
   const listRef = useRef<HTMLUListElement | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -400,9 +400,79 @@ export default function ChatBot() {
         signal: controller.signal,
       });
       const message = response.data.message;
+      if (Array.isArray(response?.data?.data)) {
+        console.log(
+          response.data.data,
+          response.data.data.map((d: { name: string; id: string }) => d.id)
+        );
+
+        setMessages((prev) =>
+          prev.slice(0, -1).concat([
+            {
+              text: message,
+              sender: "bot",
+              approvalButtons: response.data.data.map(
+                (d: { name: string; id: string }) => d.id
+              ),
+            },
+          ])
+        );
+      }
+    } catch (err: any) {
+      const isCanceled =
+        err?.code === "ERR_CANCELED" || err?.name === "CanceledError";
       setMessages((prev) =>
-        prev.slice(0, -1).concat([{ text: message, sender: "bot" }])
+        prev.slice(0, -1).concat([
+          {
+            text: isCanceled
+              ? "Request cancelled."
+              : "Error: Could not reach backend.",
+            sender: "bot",
+          },
+        ])
       );
+    } finally {
+      setIsProcessing(false);
+      abortCtrlRef.current = null;
+    }
+  };
+
+  const handleApproval = async (
+    toolCallIds: string[],
+    approved: boolean = true
+  ) => {
+    if (toolCallIds.length === 0) return;
+    const body: {
+      toolCallId: string;
+      approved: boolean;
+    }[] = toolCallIds.map((toolCallId) => ({
+      toolCallId,
+      approved,
+    }));
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/approval",
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      const message = response.data.message;
+      if (Array.isArray(response?.data?.data)) {
+        setMessages((prev) =>
+          prev.slice(0, -1).concat([
+            {
+              text: message,
+              sender: "bot",
+              approvalButtons: response.data.data.map(
+                (d: { toolName: string; toolCallId: string }) => d.toolCallId
+              ),
+            },
+          ])
+        );
+      }
     } catch (err: any) {
       const isCanceled =
         err?.code === "ERR_CANCELED" || err?.name === "CanceledError";
@@ -467,6 +537,28 @@ export default function ChatBot() {
                   dangerouslySetInnerHTML={{ __html: md.render(m.text) }}
                 />
               )}
+              {Array.isArray(m?.approvalButtons) &&
+                m.approvalButtons.length > 0 && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={async () =>
+                        await handleApproval(m.approvalButtons ?? [])
+                      }
+                    >
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () =>
+                        await handleApproval(m.approvalButtons ?? [], false)
+                      }
+                    >
+                      Reject
+                    </button>
+                  </div>
+                )}
+              <div></div>
 
               <div
                 className={`mt-1 flex items-center gap-2 ${

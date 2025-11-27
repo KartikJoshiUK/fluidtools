@@ -83,7 +83,7 @@ class FluidTools {
     const state = await this.getConversationState(threadId);
     const allPending = state.values.pendingConfirmations || [];
     // Only return those that are still pending (not approved/rejected)
-    return allPending.filter((p: PendingToolCall) => p.status === 'pending');
+    return allPending.filter((p: PendingToolCall) => p.status === "pending");
   }
 
   /**
@@ -144,7 +144,7 @@ class FluidTools {
         `No pending confirmation found for tool call ID: ${toolCallId}`
       );
     }
-    pendingConfirmations[rejectedIndex].status = 'rejected';
+    pendingConfirmations[rejectedIndex].status = "rejected";
     const result = await this.agent.invoke(
       {
         pendingConfirmations,

@@ -38,7 +38,11 @@ const fluidtools = new FluidToolsClient(
     - Try to keep everything in pointers
   `,
   7,
-  true
+  true,
+  undefined,
+  {
+    requireConfirmation: ["user_details"],
+  }
 );
 
 app.get("/", async (req: Request, res: Response) => {
@@ -53,9 +57,43 @@ app.get("/", async (req: Request, res: Response) => {
   }
 
   const response = await fluidtools.query(query, accessToken);
+  const state = await fluidtools.getPendingConfirmations(accessToken);
+  if (state.length > 0) {
+    res.status(200).send({
+      message: `Are you sure you want to call ${state
+        .map((s) => s.toolName)
+        .join(", ")}?`,
+      data: state.map((s) => ({ name: s.toolName, id: s.toolCallId })),
+    });
+    return;
+  }
   res.send({
     message: typeof response === "string" ? response : JSON.stringify(response),
   });
+});
+
+app.post("/approval", async (req: Request, res: Response) => {
+  const { authorization } = req.headers;
+  const accessToken = authorization?.split(" ")[1];
+  const toolsApproval = req.body as {
+    toolsApproval: {
+      toolCallId: string;
+      approved: boolean;
+    }[];
+  };
+
+  if (!Array.isArray(toolsApproval)) {
+    res.status(400).send({ error: "Invalid request body" });
+    return;
+  }
+
+  for (const tool of toolsApproval) {
+    if (tool.approved)
+      await fluidtools.approveToolCall(tool.toolCallId, accessToken);
+    else await fluidtools.rejectToolCall(tool.toolCallId, accessToken);
+  }
+
+  res.status(200).send({ message: "Tools approved" });
 });
 
 app.delete("/", async (req: Request, res: Response) => {
