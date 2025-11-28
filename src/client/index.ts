@@ -13,8 +13,7 @@ class FluidToolsClient {
   private debug: boolean;
   private tools: Tools;
   private confirmationConfig?: ToolConfirmationConfig;
-  private sessionMap: Map<string, { threadId: string; expiry: number }> =
-    new Map();
+  private sessionMap: Map<string, { threadId: string; expiry: number }>;
   private expireAfterSeconds: number;
 
   constructor(
@@ -28,9 +27,10 @@ class FluidToolsClient {
     maxToolCalls: number = 10,
     debug: boolean = false,
     expireAfterSeconds: number = 24 * 60 * 60,
-    confirmationConfig?: ToolConfirmationConfig
+    confirmationConfig?: ToolConfirmationConfig,
+    toolsConfig?: Record<string, any>
   ) {
-    this.tools = new Tools(toolsGenerator);
+    this.tools = new Tools(toolsGenerator, toolsConfig);
     this.config = config;
     this.expireAfterSeconds = expireAfterSeconds;
     this.systemInstructions = systemInstructions;
@@ -45,6 +45,9 @@ class FluidToolsClient {
       this.debug,
       this.confirmationConfig
     );
+    this.sessionMap = new Map();
+
+    console.log("NEW SESSION MAP INITIALIZED", 1111111111111111111111111111111);
   }
 
   private getSystemInstructions = () => {
@@ -95,19 +98,19 @@ class FluidToolsClient {
         } else {
           this.sessionMap.set(accessToken, {
             threadId: existingSession.threadId,
-            expiry: now + this.expireAfterSeconds,
+            expiry: now + this.expireAfterSeconds * 1000,
           });
         }
       } else {
         this.sessionMap.set(accessToken, {
           threadId: uuidv4(),
-          expiry: now + this.expireAfterSeconds,
+          expiry: now + this.expireAfterSeconds * 1000,
         });
       }
     }
 
     const threadId = accessToken
-      ? this.sessionMap.get(accessToken)?.threadId
+      ? this.sessionMap.get(accessToken)?.threadId ?? uuidv4()
       : "";
 
     return threadId;
@@ -117,7 +120,11 @@ class FluidToolsClient {
     logger(this.debug, "\n🎯 [FluidToolsClient.query] Query received:", query);
 
     if (accessToken) this.tools.AccessToken = accessToken;
+    console.log(this.sessionMap);
+
     const threadId = this.getThreadId(accessToken);
+
+    console.log(accessToken, threadId);
 
     const response = await this.fluidTool.query(query, threadId);
 

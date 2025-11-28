@@ -4,5 +4,7 @@ dist
 api.json
 testing
 api.json
-
 multi-agent
+venv
+.gradio
+demo/server/uploads

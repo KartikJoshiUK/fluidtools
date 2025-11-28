@@ -117,6 +117,7 @@ class FluidTools {
         awaitingConfirmation: pendingConfirmations.some(
           (p) => p.status === "pending"
         ),
+        authToken: this.tools.AccessToken,
       },
       config
     );
@@ -151,6 +152,7 @@ class FluidTools {
         awaitingConfirmation: pendingConfirmations.some(
           (p) => p.status === "pending"
         ),
+        authToken: this.tools.AccessToken,
       },
       config
     );

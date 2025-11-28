@@ -112,7 +112,8 @@
   },
   "include": [
     "src/**/*",
-    "index.ts"
+    "index.ts",
+    "demo"
   ],
   "exclude": [
     "node_modules",

@@ -9,6 +9,7 @@ export class Tools {
     axios: any,
     debug?: boolean
   ) => Record<string, any>;
+  private toolConfig: Record<string, any> = {};
   private accessToken?: string;
   constructor(
     toolsGenerator: (
@@ -17,9 +18,11 @@ export class Tools {
       axios: any,
       debug?: boolean
     ) => Record<string, any>,
+    toolsConfig?: Record<string, any>,
     debug?: boolean
   ) {
     this.toolsGenerator = toolsGenerator;
+    if (toolsConfig) this.toolConfig = toolsConfig;
   }
 
   public getToolByName(debug?: boolean) {
@@ -32,5 +35,9 @@ export class Tools {
 
   get AccessToken() {
     return this.accessToken ?? "NONE";
+  }
+
+  get Config() {
+    return this.toolConfig;
   }
 }
