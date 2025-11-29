@@ -164,11 +164,11 @@ const getAgent = (
     };
   }
   async function shouldContinue(state: typeof MessagesState.State) {
-    logger(debug, "\n🤔 [shouldContinue] Deciding next step...");
+    logger(debug, "\n [shouldContinue] Deciding next step...");
 
     const lastMessage = state.messages.at(-1);
     if (lastMessage == null || !AIMessage.isInstance(lastMessage)) {
-      logger(debug, "🛑 [shouldContinue] No AI message, ending");
+      logger(debug, " [shouldContinue] No AI message, ending");
       return END;
     }
 

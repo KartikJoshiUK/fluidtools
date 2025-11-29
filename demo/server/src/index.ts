@@ -9,6 +9,7 @@ import { loadProviderConfigFromEnv } from "../../../src/langgraph/config.js";
 import FluidToolsClient from "../../../src/index.js";
 import { postmanToLangChainCode } from "../../../src/converters/utils.js";
 import { fileURLToPath } from "url";
+import { EmbeddingClient, Tool } from "../../../src/embeddings/client.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,6 +22,21 @@ app.use(cookieParser());
 const PROVIDER_CONFIG = loadProviderConfigFromEnv();
 const MAX_TOOL_CALLS = 5;
 const EXPIRE_IDLE_CHAT_AFTER_SECONDS = 60 * 5;
+
+// Embedding configuration
+const ENABLE_EMBEDDINGS = process.env.ENABLE_EMBEDDINGS === "true";
+const MODAL_EMBEDDING_URL = process.env.MODAL_EMBEDDING_URL || "";
+
+// Initialize EmbeddingClient if enabled
+let embeddingClient: EmbeddingClient | undefined;
+if (ENABLE_EMBEDDINGS && MODAL_EMBEDDING_URL) {
+  embeddingClient = new EmbeddingClient(MODAL_EMBEDDING_URL, true);
+  console.log("✅ Embedding service enabled:", MODAL_EMBEDDING_URL);
+} else if (ENABLE_EMBEDDINGS && !MODAL_EMBEDDING_URL) {
+  console.warn("⚠️ ENABLE_EMBEDDINGS is true but MODAL_EMBEDDING_URL is not set");
+} else {
+  console.log("ℹ️ Embedding service disabled");
+}
 
 // Enable CORS for everything
 app.use(
@@ -80,6 +96,41 @@ const upload = multer({
   }),
 });
 
+/**
+ * Extract tool metadata from Postman collection JSON
+ * Converts Postman items into Tool objects for embedding indexing
+ */
+function extractToolsFromPostman(postmanJson: any): Tool[] {
+  const tools: Tool[] = [];
+
+  function processItem(item: any) {
+    if (item.request) {
+      // This is a request item
+      const name = item.name || "unnamed_tool";
+      const description = item.request.description || item.name || "";
+
+      tools.push({
+        name: name.replace(/\s+/g, "_").toLowerCase(),
+        description: typeof description === "string" ? description : description.content || "",
+        parameters: {},
+        category: "",
+      });
+    }
+
+    // Process nested items (folders)
+    if (item.item && Array.isArray(item.item)) {
+      item.item.forEach(processItem);
+    }
+  }
+
+  // Process all items in the collection
+  if (postmanJson.item && Array.isArray(postmanJson.item)) {
+    postmanJson.item.forEach(processItem);
+  }
+
+  return tools;
+}
+
 app.get("/session", (req: Request, res: Response) => {
   const uuid = randomUUID();
   session.set(uuid, { expiry: Date.now() + DEFAULT_EXPIRY });
@@ -89,8 +140,10 @@ app.get("/session", (req: Request, res: Response) => {
   res.status(200).json({ sessionId: uuid });
 });
 
-app.post("/tools", upload.single("api"), (req: Request, res: Response) => {
+app.post("/tools", upload.single("api"), async (req: Request, res: Response) => {
   console.log("TOOLS GENERATION...");
+  const sid = req.cookies.sessionid;
+
   // cleanup expired sessions
   for (const [id, data] of session.entries()) {
     if (data.expiry < Date.now()) {
@@ -98,6 +151,17 @@ app.post("/tools", upload.single("api"), (req: Request, res: Response) => {
       const dir = path.join(uploadsDir, id);
       if (fs.existsSync(dir)) {
         fs.rmSync(dir, { recursive: true });
+      }
+
+      // Clean up embeddings for expired session
+      if (embeddingClient && ENABLE_EMBEDDINGS) {
+        try {
+          await embeddingClient.deleteSession(id);
+          console.log(`✅ Cleaned up embeddings for expired session ${id}`);
+        } catch (error) {
+          console.error(`❌ Failed to clean up embeddings for expired session ${id}:`, error);
+          // Continue anyway - cleanup is best-effort
+        }
       }
     }
   }
@@ -120,6 +184,21 @@ app.post("/tools", upload.single("api"), (req: Request, res: Response) => {
   const toolsFile = path.join(path.dirname(filePath), "tools.json");
   fs.copyFileSync(filePath, toolsFile);
   fs.unlinkSync(filePath);
+
+  // Index tools with embedding service if enabled
+  if (embeddingClient && ENABLE_EMBEDDINGS) {
+    try {
+      const tools = extractToolsFromPostman(jsonContent);
+      console.log(`📊 Extracted ${tools.length} tools from Postman collection`);
+
+      await embeddingClient.indexTools(sid, tools);
+      console.log(`✅ Successfully indexed ${tools.length} tools for embeddings`);
+    } catch (error) {
+      // Log error but don't fail the request - embeddings are optional
+      console.error("❌ Failed to index tools for embeddings:", error);
+      console.log("⚠️ Continuing without embeddings - system will use all tools");
+    }
+  }
 
   res.status(200).json({ message: "tools have been generated" });
 });
@@ -146,6 +225,18 @@ app.post("/initialize", async (req: Request, res: Response) => {
         axios: any
       ) => Record<string, any>;
     } = await import(`../uploads/${sid}/tools.ts`);
+
+    // Prepare embedding configuration
+    const embeddingConfig = ENABLE_EMBEDDINGS && MODAL_EMBEDDING_URL
+      ? {
+        enabled: true,
+        modalUrl: MODAL_EMBEDDING_URL,
+        sessionId: sid,
+      }
+      : undefined;
+
+    console.log("🔧 Embedding config:", embeddingConfig ? `enabled (session: ${sid})` : "disabled");
+
     const agent = new FluidToolsClient(
       PROVIDER_CONFIG,
       tools.generateTools,
@@ -156,7 +247,8 @@ app.post("/initialize", async (req: Request, res: Response) => {
       {
         requireConfirmation: ["user_details"],
       },
-      parsedEnvVariables
+      parsedEnvVariables,
+      embeddingConfig
     );
     session.set(sid, { ...session.get(sid)!, agent });
   } catch (error) {
@@ -260,6 +352,17 @@ app.delete("/", async (req, res) => {
 
   if (accessToken) {
     await agent.clearThread(accessToken);
+  }
+
+  // Clean up embeddings when session is deleted
+  if (embeddingClient && ENABLE_EMBEDDINGS) {
+    try {
+      await embeddingClient.deleteSession(sid);
+      console.log(`✅ Cleaned up embeddings for session ${sid}`);
+    } catch (error) {
+      console.error(`❌ Failed to clean up embeddings for session ${sid}:`, error);
+      // Continue anyway - cleanup is best-effort
+    }
   }
 
   res.status(204).send({

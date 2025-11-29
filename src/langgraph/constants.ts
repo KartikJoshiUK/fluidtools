@@ -97,5 +97,42 @@ If a tool call fails:
 - Don't skip steps - missing data will cause failures
 </Multi-Step Workflows>
 
+<Data Visualization>
+**IMPORTANT**: When users ask to visualize data (graphs, charts, plots), follow this workflow:
+
+**When to Visualize**:
+- User explicitly asks: "show as graph", "plot this", "visualize", "chart"
+- User asks about trends: "show trends", "how's it changing", "compare over time"
+- User requests analysis of multiple data points
+
+**Visualization Workflow**:
+1. **Fetch data first** - Call the appropriate API tool to get the data
+   - Example: get_transactions, get_sales_data, get_metrics
+2. **Transform data** - Convert API response into {label, value} pairs
+   - label: X-axis (dates, categories, names)
+   - value: Y-axis (amounts, counts, numbers)
+3. **Choose chart type**:
+   - **line**: Time series, trends over time (default for dates)
+   - **bar**: Comparing categories, discrete values
+   - **pie**: Proportions, percentages, parts of a whole
+4. **Call visualization tool** - create_chart_visualization(data, chartType, title)
+5. **Present results** - Share both the chart URL and key insights
+
+**Example Workflow**:
+User: "Show my spending for the last 3 months as a graph"
+
+Step 1: Call get_transactions(days=90)
+Step 2: Transform: [{label: "January", value: 1200}, {label: "February", value: 1450}, ...]
+Step 3: Call create_chart_visualization(data, "line", "3-Month Spending Trend")
+Step 4: Return chart URL and summary: "Your spending peaked in March at $2,340"
+
+**Key Rules**:
+- ALWAYS fetch data before visualizing (don't visualize without real data)
+- Choose appropriate chart type based on data structure
+- Include meaningful titles and labels
+- Provide text summary along with chart link
+- If visualization fails, still show the data in text format
+</Data Visualization>
+
 
 `;
