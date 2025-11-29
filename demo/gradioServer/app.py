@@ -3,7 +3,7 @@ import requests
 import time
 import json
 
-API_URL = "http://localhost:3000"
+API_URL = "http://localhost:8000"
 client = requests.Session()
 
 session_ok = False
@@ -11,6 +11,7 @@ tools_ok = False
 initialized = False
 
 pending_requests = []  # stores pending tool requests for UI
+pending_auth_token = ""  # stores auth token for pending approvals
 
 
 def start_session():
@@ -75,41 +76,76 @@ def call_query(message, auth_token):
     except:
         return {"message": "❌ Bad response", "pending": []}
 
+    # Backend returns 'data' field for pending approvals
     return {
         "message": body.get("message", ""),
-        "pending": body.get("pending", [])
+        "pending": body.get("data", [])
     }
 
 
 def chat_send(message, history, auth_token):
-    global pending_requests
+    global pending_requests, pending_auth_token
     if not initialized:
-        return history + [{"role": "assistant", "content": "⚠ Initialize first!"}], ""
+        return history + [{"role": "assistant", "content": "⚠ Initialize first!"}], "", gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
     history.append({"role": "user", "content": message})  # user msg shows instantly
     result = call_query(message, auth_token)
 
     if result["pending"]:
         pending_requests = result["pending"]
-        approvals_msg = "\n".join(
-            [f"Pending approval for tool **{p['tool']}** (id: `{p['id']}`)" for p in pending_requests]
+        pending_auth_token = auth_token
+        approvals_msg = "⚠️ **APPROVAL REQUIRED**\n\n" + "\n".join(
+            [f"• Tool: **{p['name']}** (ID: `{p['id']}`)" for p in result["pending"]]
         )
+        approvals_msg += "\n\n👇 Use the buttons below to approve or reject these actions."
         history.append({"role": "assistant", "content": approvals_msg})
+        
+        # Show approval buttons
+        return history, "", gr.update(visible=True), gr.update(visible=True), gr.update(visible=True)
     else:
         history.append({"role": "assistant", "content": result["message"]})
+        # Hide approval buttons
+        return history, "", gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
-    return history, ""  # clears textbox immediately
+
+def send_approval(approved):
+    """Send approval/rejection to backend and continue execution."""
+    global pending_requests, pending_auth_token
+    
+    if not pending_requests:
+        return "⚠️ No pending approvals", gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
+    
+    headers = {"Authorization": f"Bearer {pending_auth_token}"} if pending_auth_token else {}
+    
+    # Build approval payload
+    approval_data = [
+        {"toolCallId": p["id"], "approved": approved}
+        for p in pending_requests
+    ]
+    
+    try:
+        r = client.post(f"{API_URL}/approval", json=approval_data, headers=headers)
+        body = r.json()
+        message = body.get("message", "✅ Approval processed" if approved else "❌ Rejected")
+        
+        # Clear pending state
+        pending_requests = []
+        
+        return message, gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
+    except Exception as e:
+        return f"❌ Error: {str(e)}", gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
 
 def reset_chat():
-    global session_ok, tools_ok, initialized, pending_requests
+    global session_ok, tools_ok, initialized, pending_requests, pending_auth_token
     try:
         client.delete(API_URL)
     except:
         pass
     session_ok = tools_ok = initialized = False
     pending_requests = []
-    return []
+    pending_auth_token = ""
+    return [], gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
 
 with gr.Blocks(title="FluidTools UI") as demo:
@@ -139,11 +175,55 @@ with gr.Blocks(title="FluidTools UI") as demo:
     auth_box = gr.Textbox(label="Auth Token (optional)", type="password")
     chat = gr.Chatbot(height=500)
     msg = gr.Textbox(placeholder="Ask something...")
-    send = gr.Button("Send")
-    reset = gr.Button("Reset")
+    
+    with gr.Row():
+        send = gr.Button("Send", variant="primary")
+        reset = gr.Button("Reset")
+    
+    # Approval section (hidden by default)
+    approval_section = gr.Markdown("### 🔐 Pending Approvals", visible=False)
+    with gr.Row():
+        approve_btn = gr.Button("✅ Approve All", variant="primary", visible=False)
+        reject_btn = gr.Button("❌ Reject All", variant="stop", visible=False)
+    
+    approval_result = gr.Textbox(label="Approval Result", visible=False, interactive=False)
 
-    send.click(chat_send, [msg, chat, auth_box], [chat, msg])
-    msg.submit(chat_send, [msg, chat, auth_box], [chat, msg])
-    reset.click(lambda: reset_chat(), None, chat)
+    # Wire up events
+    send.click(
+        chat_send, 
+        [msg, chat, auth_box], 
+        [chat, msg, approval_section, approve_btn, reject_btn]
+    )
+    msg.submit(
+        chat_send, 
+        [msg, chat, auth_box], 
+        [chat, msg, approval_section, approve_btn, reject_btn]
+    )
+    
+    approve_btn.click(
+        lambda: send_approval(True),
+        None,
+        [approval_result, approval_section, approve_btn, reject_btn]
+    ).then(
+        lambda result: (gr.update(visible=True, value=result), gr.update(visible=False)),
+        [approval_result],
+        [approval_result, approval_result]
+    )
+    
+    reject_btn.click(
+        lambda: send_approval(False),
+        None,
+        [approval_result, approval_section, approve_btn, reject_btn]
+    ).then(
+        lambda result: (gr.update(visible=True, value=result), gr.update(visible=False)),
+        [approval_result],
+        [approval_result, approval_result]
+    )
+    
+    reset.click(
+        reset_chat, 
+        None, 
+        [chat, approval_section, approve_btn, reject_btn]
+    )
 
 demo.launch()
