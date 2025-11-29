@@ -60,7 +60,12 @@ class DeleteResponse(BaseModel):
     deleted: bool
 
 
-@app.cls(image=image)
+@app.cls(
+    image=image,
+    cpu=1.0,  # Use 1 CPU (cheapest option)
+    memory=1024,  # 1GB RAM (minimum for sentence-transformers)
+    container_idle_timeout=300,  # Keep container alive for 5 minutes
+)
 class EmbeddingService:
     """
     Modal service class for embedding generation and semantic search.
@@ -270,7 +275,12 @@ class EmbeddingService:
 
 
 # FastAPI web endpoints
-@app.function(image=image)
+@app.function(
+    image=image,
+    cpu=0.5,  # Even cheaper - 0.5 CPU for web endpoint
+    memory=512,  # 512MB RAM (enough for FastAPI)
+    container_idle_timeout=300,
+)
 @modal.asgi_app()
 def fastapi_app():
     """
@@ -281,67 +291,67 @@ def fastapi_app():
     web_app = FastAPI(title="FluidTools Embedding Service")
     
     @web_app.post("/index", response_model=IndexResponse)
-    def index_endpoint(request: IndexRequest):
+    async def index_endpoint(request: IndexRequest):
         """
         Index tools for a session.
-        
+
         Creates a Qdrant collection and stores tool embeddings for semantic search.
         """
         try:
             service = EmbeddingService()
-            
+
             # Create collection
-            service.create_collection(request.session_id)
-            
+            await service.create_collection.remote(request.session_id)
+
             # Insert tools
-            count = service.insert_points(request.session_id, request.tools)
-            
+            count = await service.insert_points.remote(request.session_id, request.tools)
+
             return IndexResponse(indexed_count=count, session_id=request.session_id)
-            
+
         except Exception as e:
             print(f"Error in /index endpoint: {e}")
             raise HTTPException(status_code=500, detail=str(e))
-    
+
     @web_app.post("/search", response_model=SearchResponse)
-    def search_endpoint(request: SearchRequest):
+    async def search_endpoint(request: SearchRequest):
         """
         Search for relevant tools using semantic similarity.
-        
+
         Embeds the query and searches the Qdrant collection for similar tools.
         """
         try:
             service = EmbeddingService()
-            
+
             # Search for similar tools
-            results = service.search_similar(
-                request.session_id, 
-                request.query, 
+            results = await service.search_similar.remote(
+                request.session_id,
+                request.query,
                 request.top_k
             )
-            
+
             return SearchResponse(tools=results)
-            
+
         except Exception as e:
             print(f"Error in /search endpoint: {e}")
             # Return empty results on error (triggers fallback in client)
             return SearchResponse(tools=[])
-    
+
     @web_app.delete("/session/{session_id}", response_model=DeleteResponse)
-    def delete_session_endpoint(session_id: str):
+    async def delete_session_endpoint(session_id: str):
         """
         Delete session data and clean up Qdrant collection.
-        
+
         Args:
             session_id: Session identifier from URL path
         """
         try:
             service = EmbeddingService()
-            
+
             # Delete collection
-            success = service.delete_collection(session_id)
-            
+            success = await service.delete_collection.remote(session_id)
+
             return DeleteResponse(deleted=success)
-            
+
         except Exception as e:
             print(f"Error in /session DELETE endpoint: {e}")
             return DeleteResponse(deleted=False)
