@@ -5,7 +5,7 @@ import json
 import re
 from urllib.parse import quote
 
-API_URL = "http://localhost:8000"
+API_URL = "http://localhost:3000"
 client = requests.Session()
 
 session_ok = False
@@ -181,12 +181,12 @@ def chat_send(message, history, auth_token):
         yield history, "", gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
 
-def send_approval(approved):
+def send_approval(approved, history):
     """Send approval/rejection to backend and continue execution."""
     global pending_requests, pending_auth_token
 
     if not pending_requests:
-        return "⚠️ No pending approvals", gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
+        return "⚠️ No pending approvals", history, gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
     headers = {"Authorization": f"Bearer {pending_auth_token}"} if pending_auth_token else {}
 
@@ -204,9 +204,14 @@ def send_approval(approved):
         # Clear pending state
         pending_requests = []
 
-        return message, gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
+        # Add the message to chat history
+        history.append({"role": "assistant", "content": message})
+
+        return message, history, gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
     except Exception as e:
-        return f"❌ Error: {str(e)}", gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
+        error_msg = f"❌ Error: {str(e)}"
+        history.append({"role": "assistant", "content": error_msg})
+        return error_msg, history, gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
 
 
 def reset_chat():
@@ -367,23 +372,15 @@ with gr.Blocks(title="FluidTools - AI-Powered API Agent") as demo:
     )
 
     approve_btn.click(
-        lambda: send_approval(True),
-        None,
-        [approval_result, approval_section, approve_btn, reject_btn]
-    ).then(
-        lambda result: (gr.update(visible=True, value=result), gr.update(visible=False)),
-        [approval_result],
-        [approval_result, approval_result]
+        send_approval,
+        [gr.State(True), chat],
+        [approval_result, chat, approval_section, approve_btn, reject_btn]
     )
 
     reject_btn.click(
-        lambda: send_approval(False),
-        None,
-        [approval_result, approval_section, approve_btn, reject_btn]
-    ).then(
-        lambda result: (gr.update(visible=True, value=result), gr.update(visible=False)),
-        [approval_result],
-        [approval_result, approval_result]
+        send_approval,
+        [gr.State(False), chat],
+        [approval_result, chat, approval_section, approve_btn, reject_btn]
     )
 
     reset.click(

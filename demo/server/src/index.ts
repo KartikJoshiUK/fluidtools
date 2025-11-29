@@ -33,7 +33,9 @@ if (ENABLE_EMBEDDINGS && MODAL_EMBEDDING_URL) {
   embeddingClient = new EmbeddingClient(MODAL_EMBEDDING_URL, true);
   console.log("✅ Embedding service enabled:", MODAL_EMBEDDING_URL);
 } else if (ENABLE_EMBEDDINGS && !MODAL_EMBEDDING_URL) {
-  console.warn("⚠️ ENABLE_EMBEDDINGS is true but MODAL_EMBEDDING_URL is not set");
+  console.warn(
+    "⚠️ ENABLE_EMBEDDINGS is true but MODAL_EMBEDDING_URL is not set"
+  );
 } else {
   console.log("ℹ️ Embedding service disabled");
 }
@@ -111,7 +113,10 @@ function extractToolsFromPostman(postmanJson: any): Tool[] {
 
       tools.push({
         name: name.replace(/\s+/g, "_").toLowerCase(),
-        description: typeof description === "string" ? description : description.content || "",
+        description:
+          typeof description === "string"
+            ? description
+            : description.content || "",
         parameters: {},
         category: "",
       });
@@ -140,68 +145,81 @@ app.get("/session", (req: Request, res: Response) => {
   res.status(200).json({ sessionId: uuid });
 });
 
-app.post("/tools", upload.single("api"), async (req: Request, res: Response) => {
-  console.log("TOOLS GENERATION...");
-  const sid = req.cookies.sessionid;
+app.post(
+  "/tools",
+  upload.single("api"),
+  async (req: Request, res: Response) => {
+    console.log("TOOLS GENERATION...");
+    const sid = req.cookies.sessionid;
 
-  // cleanup expired sessions
-  for (const [id, data] of session.entries()) {
-    if (data.expiry < Date.now()) {
-      session.delete(id);
-      const dir = path.join(uploadsDir, id);
-      if (fs.existsSync(dir)) {
-        fs.rmSync(dir, { recursive: true });
-      }
+    // cleanup expired sessions
+    for (const [id, data] of session.entries()) {
+      if (data.expiry < Date.now()) {
+        session.delete(id);
+        const dir = path.join(uploadsDir, id);
+        if (fs.existsSync(dir)) {
+          fs.rmSync(dir, { recursive: true });
+        }
 
-      // Clean up embeddings for expired session
-      if (embeddingClient && ENABLE_EMBEDDINGS) {
-        try {
-          await embeddingClient.deleteSession(id);
-          console.log(`✅ Cleaned up embeddings for expired session ${id}`);
-        } catch (error) {
-          console.error(`❌ Failed to clean up embeddings for expired session ${id}:`, error);
-          // Continue anyway - cleanup is best-effort
+        // Clean up embeddings for expired session
+        if (embeddingClient && ENABLE_EMBEDDINGS) {
+          try {
+            await embeddingClient.deleteSession(id);
+            console.log(`✅ Cleaned up embeddings for expired session ${id}`);
+          } catch (error) {
+            console.error(
+              `❌ Failed to clean up embeddings for expired session ${id}:`,
+              error
+            );
+            // Continue anyway - cleanup is best-effort
+          }
         }
       }
     }
-  }
 
-  const filePath = (req as any).file.path;
-  const jsonContent = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    const filePath = (req as any).file.path;
+    const jsonContent = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
-  try {
-    const toolsCode = postmanToLangChainCode(jsonContent);
-    const toolsTsFile = path.join(path.dirname(filePath), "tools.ts");
-    fs.writeFileSync(toolsTsFile, toolsCode);
-  } catch {
+    try {
+      const toolsCode = postmanToLangChainCode(jsonContent);
+      const toolsTsFile = path.join(path.dirname(filePath), "tools.ts");
+      fs.writeFileSync(toolsTsFile, toolsCode);
+    } catch {
+      const toolsFile = path.join(path.dirname(filePath), "tools.json");
+      fs.copyFileSync(filePath, toolsFile);
+      fs.unlinkSync(filePath);
+      res.status(400).send({ message: "Invalid APIs" });
+      return;
+    }
+
     const toolsFile = path.join(path.dirname(filePath), "tools.json");
     fs.copyFileSync(filePath, toolsFile);
     fs.unlinkSync(filePath);
-    res.status(400).send({ message: "Invalid APIs" });
-    return;
-  }
 
-  const toolsFile = path.join(path.dirname(filePath), "tools.json");
-  fs.copyFileSync(filePath, toolsFile);
-  fs.unlinkSync(filePath);
+    // Index tools with embedding service if enabled
+    if (embeddingClient && ENABLE_EMBEDDINGS) {
+      try {
+        const tools = extractToolsFromPostman(jsonContent);
+        console.log(
+          `📊 Extracted ${tools.length} tools from Postman collection`
+        );
 
-  // Index tools with embedding service if enabled
-  if (embeddingClient && ENABLE_EMBEDDINGS) {
-    try {
-      const tools = extractToolsFromPostman(jsonContent);
-      console.log(`📊 Extracted ${tools.length} tools from Postman collection`);
-
-      await embeddingClient.indexTools(sid, tools);
-      console.log(`✅ Successfully indexed ${tools.length} tools for embeddings`);
-    } catch (error) {
-      // Log error but don't fail the request - embeddings are optional
-      console.error("❌ Failed to index tools for embeddings:", error);
-      console.log("⚠️ Continuing without embeddings - system will use all tools");
+        await embeddingClient.indexTools(sid, tools);
+        console.log(
+          `✅ Successfully indexed ${tools.length} tools for embeddings`
+        );
+      } catch (error) {
+        // Log error but don't fail the request - embeddings are optional
+        console.error("❌ Failed to index tools for embeddings:", error);
+        console.log(
+          "⚠️ Continuing without embeddings - system will use all tools"
+        );
+      }
     }
-  }
 
-  res.status(200).json({ message: "tools have been generated" });
-});
+    res.status(200).json({ message: "tools have been generated" });
+  }
+);
 
 app.post("/initialize", async (req: Request, res: Response) => {
   const sid = req.cookies.sessionid;
@@ -227,15 +245,19 @@ app.post("/initialize", async (req: Request, res: Response) => {
     } = await import(`../uploads/${sid}/tools.ts`);
 
     // Prepare embedding configuration
-    const embeddingConfig = ENABLE_EMBEDDINGS && MODAL_EMBEDDING_URL
-      ? {
-        enabled: true,
-        modalUrl: MODAL_EMBEDDING_URL,
-        sessionId: sid,
-      }
-      : undefined;
+    const embeddingConfig =
+      ENABLE_EMBEDDINGS && MODAL_EMBEDDING_URL
+        ? {
+            enabled: true,
+            modalUrl: MODAL_EMBEDDING_URL,
+            sessionId: sid,
+          }
+        : undefined;
 
-    console.log("🔧 Embedding config:", embeddingConfig ? `enabled (session: ${sid})` : "disabled");
+    console.log(
+      "🔧 Embedding config:",
+      embeddingConfig ? `enabled (session: ${sid})` : "disabled"
+    );
 
     const agent = new FluidToolsClient(
       PROVIDER_CONFIG,
@@ -332,6 +354,17 @@ app.post("/approval", async (req, res) => {
     else response = await agent.rejectToolCall(tool.toolCallId, accessToken);
   }
 
+  const state = await agent?.getPendingConfirmations(accessToken);
+  if (state.length > 0) {
+    res.status(200).send({
+      message: `Are you sure you want to call ${state
+        .map((s) => s.toolName)
+        .join(", ")}?`,
+      data: state.map((s) => ({ name: s.toolName, id: s.toolCallId })),
+    });
+    return;
+  }
+
   res.status(200).send({
     message: typeof response === "string" ? response : response?.toString(),
   });
@@ -360,7 +393,10 @@ app.delete("/", async (req, res) => {
       await embeddingClient.deleteSession(sid);
       console.log(`✅ Cleaned up embeddings for session ${sid}`);
     } catch (error) {
-      console.error(`❌ Failed to clean up embeddings for session ${sid}:`, error);
+      console.error(
+        `❌ Failed to clean up embeddings for session ${sid}:`,
+        error
+      );
       // Continue anyway - cleanup is best-effort
     }
   }
