@@ -222,23 +222,7 @@ def reset_chat():
 
 
 # Build the UI
-with gr.Blocks(
-    title="FluidTools - AI-Powered API Agent",
-    theme=gr.themes.Soft(primary_hue="blue"),
-    css="""
-        .gradio-container {
-            max-width: 1400px !important;
-        }
-        .header-box {
-            text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-    """
-) as demo:
+with gr.Blocks(title="FluidTools - AI-Powered API Agent") as demo:
 
     # Header
     gr.HTML("""
