@@ -392,7 +392,7 @@ with gr.Blocks(title="FluidTools - AI-Powered API Agent") as demo:
 # Launch the app
 if __name__ == "__main__":
     demo.launch(
-        server_name="0.0.0.0",  # Allow external access
+        # server_name="0.0.0.0",  # Allow external access
         server_port=7860,
         share=False,  # Set to True to get public URL
         show_error=True
