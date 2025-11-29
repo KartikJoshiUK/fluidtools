@@ -81,6 +81,20 @@ export function validateProviderConfig(config: ProviderConfig): void {
       }
       break;
 
+    case "nebius":
+      if (!config.apiKey) {
+        throw new ProviderConfigError("Nebius API key is required");
+      }
+      if (typeof config.apiKey !== "string" || config.apiKey.trim() === "") {
+        throw new ProviderConfigError(
+          "Nebius API key must be a non-empty string"
+        );
+      }
+      if (config.baseUrl && typeof config.baseUrl !== "string") {
+        throw new ProviderConfigError("Nebius baseUrl must be a string");
+      }
+      break;
+
     default:
       throw new ProviderConfigError(
         `Unsupported provider type: ${(config as any).type}`
@@ -104,6 +118,8 @@ export function loadProviderConfigFromEnv(): ProviderConfig {
 
       case "gemini":
         return "gemini-2.5-flash-lite";
+      case "nebius":
+        return "meta-llama/Meta-Llama-3.1-8B-Instruct";
       default:
         return "llama3.2:3b";
     }
@@ -159,6 +175,17 @@ export function loadProviderConfigFromEnv(): ProviderConfig {
         type: "gemini",
         model,
         apiKey: process.env.GEMINI_API_KEY || "",
+        temperature: parseNumeric(process.env.PROVIDER_TEMPERATURE, 0.7),
+        maxTokens: parseNumeric(process.env.PROVIDER_MAX_TOKENS, undefined),
+        topP: parseNumeric(process.env.PROVIDER_TOP_P, undefined),
+      };
+
+    case "nebius":
+      return {
+        type: "nebius",
+        model,
+        apiKey: process.env.NEBIUS_API_KEY || "",
+        baseUrl: process.env.NEBIUS_BASE_URL || "https://api.studio.nebius.ai/v1/",
         temperature: parseNumeric(process.env.PROVIDER_TEMPERATURE, 0.7),
         maxTokens: parseNumeric(process.env.PROVIDER_MAX_TOKENS, undefined),
         topP: parseNumeric(process.env.PROVIDER_TOP_P, undefined),

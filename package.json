@@ -17,14 +17,14 @@
   "types": "dist/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
       "require": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
     }
   },
   "files": [
     "dist",
-    "!dist/temp-server",
+    "!dist/demo",
     "README.md",
     "package.json",
     "LICENSE"
@@ -54,13 +54,21 @@
     "@langchain/ollama": "^1.0.1",
     "@langchain/openai": "^1.1.1",
     "axios": "^1.13.2",
+    "chalk": "^5.6.2",
     "dotenv": "^16.6.1",
+    "figlet": "^1.9.4",
+    "gradio": "^0.1.0",
+    "inquirer": "^13.0.1",
     "langchain": "^1.0.4",
     "langsmith": "^0.3.79",
+    "ora": "^9.0.0",
     "typescript": "^5.9.3",
+    "uuid": "^13.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/figlet": "^1.7.0",
+    "@types/inquirer": "^9.0.9",
     "@types/node": "^24.10.1"
   },
   "bin": {

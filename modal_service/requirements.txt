@@ -1,0 +1,4 @@
+sentence-transformers==3.0.1
+qdrant-client==1.7.0
+fastapi==0.104.1
+pydantic==2.5.0

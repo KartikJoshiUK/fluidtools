@@ -2,9 +2,11 @@ node_modules
 dist
 .env
 api.json
-src/temp-server
 testing
 api.json
-
 multi-agent
 venv
+.gradio
+demo/server/uploads
+app_improved.py
+demo.py

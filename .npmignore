@@ -1,6 +1,6 @@
 # Source files (only publish dist)
 src/
-dist/temp-server/
+dist/demo/
 *.ts
 !*.d.ts
 tsconfig.json
