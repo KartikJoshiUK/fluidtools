@@ -5,11 +5,14 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
-import { loadProviderConfigFromEnv } from "../../../src/langgraph/config.js";
-import FluidToolsClient from "../../../src/index.js";
-import { postmanToLangChainCode } from "../../../src/converters/utils.js";
 import { fileURLToPath } from "url";
-import { EmbeddingClient, Tool } from "../../../src/embeddings/client.js";
+import {
+  loadProviderConfigFromEnv,
+  Tool,
+  EmbeddingClient,
+  FluidToolsClient,
+  postmanToLangChainCode,
+} from "fluidtools";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

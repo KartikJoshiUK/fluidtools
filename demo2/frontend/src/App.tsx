@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ChatBot from "./ChatBot";
+import ChatBot from "./ChatBot.js";
 import { FiMessageCircle, FiX } from "react-icons/fi";
 
 export default function App() {

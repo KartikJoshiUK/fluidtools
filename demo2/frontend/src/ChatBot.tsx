@@ -9,8 +9,8 @@ import {
   FiRefreshCw,
 } from "react-icons/fi";
 import MarkdownIt from "markdown-it";
-import TTSButton from "./TTSButton";
-import STTControl from "./STTButton";
+import TTSButton from "./TTSButton.js";
+import STTControl from "./STTButton.js";
 
 const md = MarkdownIt();
 

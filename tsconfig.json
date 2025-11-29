@@ -114,10 +114,10 @@
     "src/**/*",
     "index.ts",
     "demo"
-  ],
+, "demo2"  ],
   "exclude": [
     "node_modules",
-    "src/demo",
+    "demo2",
     "dist",
     "@testing",
     "testing",

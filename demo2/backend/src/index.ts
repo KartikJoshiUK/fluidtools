@@ -1,9 +1,8 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { generateTools } from "./tools.js";
-import { loadProviderConfigFromEnv } from "../../../langgraph/config.js";
-import FluidToolsClient from "../../../client/index.js";
 import { ContentBlock } from "langchain";
+import { FluidToolsClient, loadProviderConfigFromEnv } from "fluidtools";
 
 const app = express();
 

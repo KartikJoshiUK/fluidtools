@@ -3,4 +3,4 @@
  * Export utility tools that can be used alongside Postman-generated tools
  */
 
-export { createVisualizationTool } from './visualization';
+export { createVisualizationTool } from "./visualization.js";
