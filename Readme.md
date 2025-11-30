@@ -23,7 +23,7 @@ FluidTools is a powerful NPM package that transforms REST API collections (Postm
 
 ## Sponsors
 
-<div style="display: flex; justify-content: center; gap: 45px; flex-wrap: wrap; margin: 18px 0; flex-wrap:wrap;">
+<div style="display: flex; justify-content: center; gap: 35px; flex-wrap: wrap; margin: 18px 0;">
     <a href="https://www.gradio.app/" target="_blank">
         <img src="https://www.gradio.app/_app/immutable/assets/gradiodark.CbgYRzQH.svg"
             style="height: 30px; object-fit: contain; filter: drop-shadow(0px 0px 10px rgba(140,110,255,0.65)); transition: 0.25s;">
@@ -35,6 +35,18 @@ FluidTools is a powerful NPM package that transforms REST API collections (Postm
     <a href="https://modal.com/" target="_blank">
         <img src="https://modal.com/_app/immutable/assets/logo.lottie.CgmMXf1s.png"
             style="height: 30px; object-fit: contain; filter: drop-shadow(0px 0px 10px rgba(255,105,95,0.6)); transition: 0.25s;">
+    </a>
+    <a href="https://openai.com/" target="_blank">
+        <img src="https://logosandtypes.com/wp-content/uploads/2022/07/OpenAI.png"
+            style="height: 30px; object-fit: contain; filter: drop-shadow(0px 0px 10px rgba(34, 197, 94, 0.65)); transition: 0.25s;">
+    </a>
+    <a href="https://huggingface.co/" target="_blank">
+        <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg"
+            style="height: 30px; object-fit: contain; filter: drop-shadow(0px 0px 10px rgba(255,100,150,0.65)); transition: 0.25s;">
+    </a>
+    <a href="https://gemini.google.com/" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Google_Gemini_logo.svg/2560px-Google_Gemini_logo.svg.png"
+            style="height: 30px; object-fit: contain; filter: drop-shadow(0px 0px 10px rgba(66, 133, 244, 0.65)); transition: 0.25s;">
     </a>
 </div>
 
