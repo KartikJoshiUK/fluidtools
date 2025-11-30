@@ -212,21 +212,21 @@ graph TD
 ```
 
 Postman Collection JSON ──────┐
-│
+                              │
 CLI Tool (fluidtools) ────────▼
-│
+                              │
 TypeScript Tool Code ─────────▼
-│
-Express/Fastify Server ──────▼
-│
-FluidTools Client ───────────▼
-│
-LangGraph Agent ─────────────▼
-│
-LLM Provider + Tools ────────▼
-│
-API Calls + Responses ───────▼
-│
+                              │
+Express/Fastify Server ───────▼
+                              │
+FluidTools Client ────────────▼
+                              │
+LangGraph Agent ──────────────▼
+                              │
+LLM Provider + Tools ─────────▼
+                              │
+API Calls + Responses ────────▼
+                              │
 User-Friendly Chat Response ──▼
 
 ```
