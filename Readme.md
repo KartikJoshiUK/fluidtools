@@ -109,11 +109,11 @@ curl -X GET "http://localhost:8000/?query=Get user details and list their projec
 graph TD
     A[Postman 2.1 JSON] --> B[CLI Tool<br/>fluidtools]
     B --> C[Tool Generation<br/>TypeScript + Zod Schemas]
-
     C --> D[FluidTools Client]
+
     D --> E[Optional Embedding Service<br/>Semantic Tool Selection]
 
-    C --> F[System Prompt<br/>Custom Chatbots]
+    D --> F[System Prompt<br/>Custom Chatbots]
     F --> G[LangGraph Agent<br/>Orchestration & Memory]
 
     G --> H[Multi-Provider LLM Support]
