@@ -6,10 +6,14 @@ interface RateLimitEntry {
 
 class RateLimiter {
   private limits: Map<string, RateLimitEntry> = new Map();
-  private readonly FREE_TIER_LIMIT = 10;
-  private readonly RESET_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 hours
+  private readonly FREE_TIER_LIMIT = 2;
+  private readonly RESET_INTERVAL_MS = 60 * 1000; // 1 hour
 
-  check(ip: string): { allowed: boolean; remaining: number; resetTime: number } {
+  check(ip: string): {
+    allowed: boolean;
+    remaining: number;
+    resetTime: number;
+  } {
     const now = Date.now();
     const entry = this.limits.get(ip);
 

@@ -21,7 +21,8 @@ export function buildProviderConfig(request: ProviderRequest): ProviderConfig {
       // Model is always from server env for free tier
       return {
         type: "nebius",
-        model: process.env.PROVIDER_MODEL || "meta-llama/Meta-Llama-3.1-8B-Instruct",
+        model:
+          process.env.PROVIDER_MODEL || "meta-llama/Meta-Llama-3.1-8B-Instruct",
         apiKey: process.env.NEBIUS_API_KEY || "",
         baseUrl:
           process.env.NEBIUS_BASE_URL || "https://api.studio.nebius.ai/v1/",
@@ -41,7 +42,7 @@ export function buildProviderConfig(request: ProviderRequest): ProviderConfig {
       if (!apiKey) throw new Error("Anthropic API key is required");
       return {
         type: "anthropic",
-        model: model || "claude-3-5-sonnet-20241022",
+        model: model || "claude-3-5-sonnet",
         apiKey,
         temperature: 0.7,
       };
@@ -50,7 +51,7 @@ export function buildProviderConfig(request: ProviderRequest): ProviderConfig {
       if (!apiKey) throw new Error("Gemini API key is required");
       return {
         type: "gemini",
-        model: model || "gemini-2.0-flash",
+        model: model || "gemini-2.5-flash",
         apiKey,
         temperature: 0.7,
       };

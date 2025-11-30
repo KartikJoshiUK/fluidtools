@@ -238,6 +238,7 @@ app.post("/initialize", async (req: Request, res: Response) => {
     systemIntructions = "",
     envVariables = {},
     provider = "nebius-free",
+    model,
     apiKey,
   } = req.body;
 
@@ -245,7 +246,12 @@ app.post("/initialize", async (req: Request, res: Response) => {
   if (typeof envVariables === "string")
     parsedEnvVariables = JSON.parse(envVariables);
 
-  console.log("INITIALIZING", { sid, provider, systemIntructions });
+  console.log("INITIALIZING", {
+    sid,
+    provider,
+    systemIntructions,
+    model,
+  });
 
   if (new Date(session.get(sid)?.expiry ?? 0) < new Date()) {
     res.status(401).send({ message: "Session has been expired" });
@@ -281,7 +287,7 @@ app.post("/initialize", async (req: Request, res: Response) => {
     // Build provider config from request
     let providerConfig;
     try {
-      providerConfig = buildProviderConfig({ provider, apiKey });
+      providerConfig = buildProviderConfig({ provider, apiKey, model });
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
 
@@ -363,13 +369,38 @@ app.get("/", async (req: Request, res: Response) => {
     return;
   }
 
+  // Rate limit check for free tier
+  if (sessionData?.isFreeTier) {
+    const clientIp = req.ip || req.socket.remoteAddress || "unknown";
+    const rateLimit = rateLimiter.check(clientIp);
+
+    if (!rateLimit.allowed) {
+      const resetDate = new Date(rateLimit.resetTime);
+      res.status(429).send({
+        message: "Free tier rate limit exceeded",
+        resetTime: rateLimit.resetTime,
+        resetDate: resetDate.toISOString(),
+      });
+      return;
+    }
+  }
+
+  let message = "Something went wrong";
+  try {
+    message =
+      (await agent?.query(query.toString(), accessToken))?.toString() ??
+      "Something went wrong";
+  } catch (error: any) {
+    console.log(error.message);
+
+    if (error.message) message = error.message;
+  }
+
   // Record usage for free tier
   if (sessionData?.isFreeTier) {
     const clientIp = req.ip || req.socket.remoteAddress || "unknown";
     rateLimiter.record(clientIp);
   }
-
-  const message = await agent?.query(query.toString(), accessToken);
 
   const state = await agent?.getPendingConfirmations(accessToken);
   if (state.length > 0) {
@@ -382,7 +413,7 @@ app.get("/", async (req: Request, res: Response) => {
     return;
   }
 
-  res.status(200).send({ message: message?.toString() });
+  res.status(200).send({ message: message });
 });
 
 app.get("/rate-limit", (req: Request, res: Response) => {
