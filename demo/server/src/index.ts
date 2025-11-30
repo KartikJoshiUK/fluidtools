@@ -13,6 +13,12 @@ import {
   FluidToolsClient,
   postmanToLangChainCode,
 } from "fluidtools";
+import { rateLimiter } from "./rateLimiter.js";
+import {
+  buildProviderConfig,
+  ProviderSelection,
+  getProviderHelpLink,
+} from "./providerBuilder.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,6 +82,8 @@ const DEFAULT_EXPIRY = 24 * 60 * 60 * 1000; // 1 day
 type SESSION_DATA = {
   agent?: FluidToolsClient;
   expiry: number;
+  provider?: ProviderSelection;
+  isFreeTier?: boolean;
 };
 
 const session: Map<string, SESSION_DATA> = new Map<string, SESSION_DATA>();
@@ -226,18 +234,41 @@ app.post(
 
 app.post("/initialize", async (req: Request, res: Response) => {
   const sid = req.cookies.sessionid;
-  const { systemIntructions = "", envVariables = {} } = req.body;
+  const {
+    systemIntructions = "",
+    envVariables = {},
+    provider = "nebius-free",
+    apiKey,
+  } = req.body;
 
   let parsedEnvVariables = envVariables;
   if (typeof envVariables === "string")
     parsedEnvVariables = JSON.parse(envVariables);
 
-  console.log("INITIALIZING", { sid, systemIntructions, envVariables });
+  console.log("INITIALIZING", { sid, provider, systemIntructions });
 
   if (new Date(session.get(sid)?.expiry ?? 0) < new Date()) {
     res.status(401).send({ message: "Session has been expired" });
     return;
   }
+
+  // Rate limit check for free tier
+  const isFreeTier = provider === "nebius-free";
+  if (isFreeTier) {
+    const clientIp = req.ip || req.connection.remoteAddress || "unknown";
+    const rateLimit = rateLimiter.check(clientIp);
+
+    if (!rateLimit.allowed) {
+      const resetDate = new Date(rateLimit.resetTime);
+      res.status(429).send({
+        message: "Free tier rate limit exceeded",
+        resetTime: rateLimit.resetTime,
+        resetDate: resetDate.toISOString(),
+      });
+      return;
+    }
+  }
+
   try {
     const tools: {
       generateTools: (
@@ -246,6 +277,24 @@ app.post("/initialize", async (req: Request, res: Response) => {
         axios: any
       ) => Record<string, any>;
     } = await import(`../uploads/${sid}/tools.ts`);
+
+    // Build provider config from request
+    let providerConfig;
+    try {
+      providerConfig = buildProviderConfig({ provider, apiKey });
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+
+      if (errorMsg.includes("API key is required")) {
+        res.status(400).send({
+          message: `API key required for ${provider}`,
+          help: getProviderHelpLink(provider),
+        });
+        return;
+      }
+
+      throw error;
+    }
 
     // Prepare embedding configuration
     const embeddingConfig =
@@ -257,13 +306,10 @@ app.post("/initialize", async (req: Request, res: Response) => {
           }
         : undefined;
 
-    console.log(
-      "🔧 Embedding config:",
-      embeddingConfig ? `enabled (session: ${sid})` : "disabled"
-    );
+    console.log("🔧 Provider:", provider, "| Free tier:", isFreeTier);
 
     const agent = new FluidToolsClient(
-      PROVIDER_CONFIG,
+      providerConfig,
       tools.generateTools,
       systemIntructions,
       MAX_TOOL_CALLS,
@@ -275,9 +321,19 @@ app.post("/initialize", async (req: Request, res: Response) => {
       parsedEnvVariables,
       embeddingConfig
     );
-    session.set(sid, { ...session.get(sid)!, agent });
+
+    session.set(sid, {
+      ...session.get(sid)!,
+      agent,
+      provider,
+      isFreeTier,
+    });
   } catch (error) {
-    res.status(400).send({ message: "Tools are not avaiable.", error });
+    console.error("Initialization error:", error);
+    res.status(400).send({
+      message: "Tools are not available or invalid API key",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return;
   }
 
@@ -299,11 +355,20 @@ app.get("/", async (req: Request, res: Response) => {
     res.status(400).send({ message: "Query is not provided" });
     return;
   }
-  const agent = session.get(sid)?.agent;
+
+  const sessionData = session.get(sid);
+  const agent = sessionData?.agent;
   if (!agent) {
     res.status(400).send({ message: "Agent is corrupted" });
     return;
   }
+
+  // Record usage for free tier
+  if (sessionData?.isFreeTier) {
+    const clientIp = req.ip || req.socket.remoteAddress || "unknown";
+    rateLimiter.record(clientIp);
+  }
+
   const message = await agent?.query(query.toString(), accessToken);
 
   const state = await agent?.getPendingConfirmations(accessToken);
@@ -318,6 +383,30 @@ app.get("/", async (req: Request, res: Response) => {
   }
 
   res.status(200).send({ message: message?.toString() });
+});
+
+app.get("/rate-limit", (req: Request, res: Response) => {
+  const sid = req.cookies.sessionid;
+  const sessionData = session.get(sid);
+
+  if (!sessionData?.isFreeTier) {
+    res.status(200).json({
+      isFreeTier: false,
+      unlimited: true,
+    });
+    return;
+  }
+
+  const clientIp = req.ip || req.socket.remoteAddress || "unknown";
+  const rateLimit = rateLimiter.check(clientIp);
+
+  res.status(200).json({
+    isFreeTier: true,
+    allowed: rateLimit.allowed,
+    remaining: rateLimit.remaining,
+    resetTime: rateLimit.resetTime,
+    resetDate: new Date(rateLimit.resetTime).toISOString(),
+  });
 });
 
 app.post("/approval", async (req, res) => {
