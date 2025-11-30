@@ -181,7 +181,13 @@ textarea:focus {
 
 /* Dropdowns - Glass Style */
 select,
-.dropdown {
+.dropdown,
+.dropdown select,
+.gradio-dropdown,
+.gradio-dropdown .wrap,
+.gradio-dropdown input,
+.gradio-dropdown .wrap-inner,
+.svelte-1gfkn6j {
     background: rgba(255, 255, 255, 0.4) !important;
     backdrop-filter: var(--blur-sm) !important;
     -webkit-backdrop-filter: var(--blur-sm) !important;
@@ -244,6 +250,93 @@ select,
 .prose {
     color: var(--text-primary) !important;
     line-height: 1.7;
+}
+
+/* Ensure all text is visible - Fix white on white issue */
+label,
+.label,
+.gradio-label,
+.gr-form label,
+span,
+p,
+div,
+.markdown-body,
+.gr-text-input label,
+.gr-dropdown label,
+.gr-textbox label,
+.gr-file label,
+.gr-accordion .label-wrap span {
+    color: var(--text-primary) !important;
+}
+
+/* Specific fixes for textboxes and inputs */
+.gr-text-input input,
+.gr-text-input textarea,
+.gr-textbox input,
+.gr-textbox textarea {
+    color: var(--text-primary) !important;
+}
+
+/* Dropdown text visibility */
+.gr-dropdown .wrap,
+.gr-dropdown option,
+select option {
+    color: var(--text-primary) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Chat messages */
+.message,
+.bot,
+.user {
+    color: var(--text-primary) !important;
+}
+
+/* Accordion headers */
+.gr-accordion button span {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+}
+
+/* Button text visibility */
+button span,
+button {
+    color: inherit !important;
+}
+
+/* Force all Gradio components to have visible text */
+.gr-box *,
+.gr-form *,
+.gr-input *,
+.gr-panel * {
+    color: var(--text-primary) !important;
+}
+
+/* Dropdown specific fixes */
+.gr-dropdown,
+.gr-dropdown *,
+.dropdown,
+.dropdown * {
+    color: var(--text-primary) !important;
+}
+
+.gr-dropdown .wrap,
+.gr-dropdown .wrap * {
+    background: rgba(255, 255, 255, 0.6) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Input text color */
+input,
+textarea {
+    color: var(--text-primary) !important;
+}
+
+/* Ensure dropdown options are visible */
+.gr-dropdown ul,
+.gr-dropdown li {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--text-primary) !important;
 }
 
 /* Scrollbar Styling */
@@ -354,6 +447,29 @@ GLASSMORPHISM_JS = """
             if (!upload.classList.contains('file-upload-processed')) {
                 upload.classList.add('file-upload-container');
                 upload.classList.add('file-upload-processed');
+            }
+        });
+
+        // Fix dropdown visibility and styling
+        const dropdowns = document.querySelectorAll('.gr-dropdown, [role="listbox"]');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.classList.contains('dropdown-fixed')) {
+                dropdown.classList.add('dropdown-fixed');
+                dropdown.style.color = 'rgba(30, 30, 50, 0.95)';
+
+                // Fix all child elements
+                const children = dropdown.querySelectorAll('*');
+                children.forEach(child => {
+                    child.style.color = 'rgba(30, 30, 50, 0.95)';
+                });
+            }
+        });
+
+        // Fix all labels
+        const labels = document.querySelectorAll('label, .label, span');
+        labels.forEach(label => {
+            if (!label.style.color || label.style.color === 'rgb(255, 255, 255)') {
+                label.style.color = 'rgba(30, 30, 50, 0.95)';
             }
         });
     }
