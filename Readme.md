@@ -167,6 +167,8 @@ graph TD
 
     L --> T[Chatbot UI<br/>Gradio/React/Web]
 
+```
+
 ### System Architecture Overview
 
 1. **Postman Collection Processing**
@@ -227,7 +229,7 @@ API Calls + Responses ───────▼
 │
 User-Friendly Chat Response ──▼
 
-````
+```
 
 ## Demo 1: Gradio Integration (Public Testing)
 
@@ -248,7 +250,7 @@ Located in `./demo/server/`, this demo provides a complete Express server with G
 cd demo/server
 npm install
 npm start
-````
+```
 
 Backend runs on `http://localhost:3000`
 
