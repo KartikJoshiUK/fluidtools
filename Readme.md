@@ -16,9 +16,27 @@ FluidTools is a powerful NPM package that transforms REST API collections (Postm
 - 🤖 **Multi-Provider AI Support**: Compatible with OpenAI, Anthropic, Ollama, Gemini, and Nebius
 - 🔧 **LangGraph Integration**: Robust agent orchestration with state management and memory
 - 📊 **Semantic Tool Selection**: Optional embedding-based tool filtering for large APIs
-- ✅ **Tool Confirmation**: User approval system for sensitive operations
+- ✅ **Human-in-Loop Security**: Exact tool selection and user approval for sensitive operations
+- 🌍 **Multi-Language Support**: Babel integration for international chatbot deployment
 - 🌐 **Server Agnostic**: Integrates with any Express/Fastify/Koa server
 - ⚡ **TypeScript First**: Full type safety with Zod schemas
+
+## Sponsors
+
+<div style="display: flex; justify-content: center; gap: 45px; flex-wrap: wrap; margin: 18px 0; flex-wrap:wrap;">
+    <a href="https://www.gradio.app/" target="_blank">
+        <img src="https://www.gradio.app/_app/immutable/assets/gradiodark.CbgYRzQH.svg"
+            style="height: 30px; object-fit: contain; filter: drop-shadow(0px 0px 10px rgba(140,110,255,0.65)); transition: 0.25s;">
+    </a>
+    <a href="https://nebius.com/" target="_blank">
+        <img src="https://nebius.com/logo.svg"
+            style="height: 30px; object-fit: contain; filter: drop-shadow(0px 0px 10px rgba(110,190,255,0.6)); transition: 0.25s;">
+    </a>
+    <a href="https://modal.com/" target="_blank">
+        <img src="https://modal.com/_app/immutable/assets/logo.lottie.CgmMXf1s.png"
+            style="height: 30px; object-fit: contain; filter: drop-shadow(0px 0px 10px rgba(255,105,95,0.6)); transition: 0.25s;">
+    </a>
+</div>
 
 ## Installation
 
@@ -89,38 +107,65 @@ curl -X GET "http://localhost:8000/?query=Get user details and list their projec
 
 ```mermaid
 graph TD
-    A[Postman 2.1 JSON] --> B[CLI Converter]
-    B --> C[LangChain Tools with Zod Schemas]
-    C --> D[FluidToolsClient]
-    D --> E[LangGraph Agent]
-    E --> F[Multiple LLM Providers]
-    D --> G[Optional Embeddings Service]
-    G --> H[Semantic Tool Selection]
+    A[Postman 2.1 JSON] --> B[CLI Tool<br/>fluidtools]
+    B --> C[Tool Generation<br/>TypeScript + Zod Schemas]
 
-    subgraph "Core Components"
+    C --> D[FluidTools Client]
+    D --> E[Optional Embedding Service<br/>Semantic Tool Selection]
+
+    C --> F[System Prompt<br/>Custom Chatbots]
+    F --> G[LangGraph Agent<br/>Orchestration & Memory]
+
+    G --> H[Multi-Provider LLM Support]
+    H --> I[Multiple Model Support]
+    I --> J[Multi-Language Support<br/>Babel Integration]
+
+    J --> K[Server Integration<br/>Express/Fastify/Koa]
+    K --> L[API Exposed<br/>REST/WebSocket]
+
+    subgraph "🔧 Tool Conversion Pipeline"
+        A
         B
         C
+    end
+
+    subgraph "🤖 AI Agent Core"
         D
-        E
         F
         G
         H
+        I
+        J
     end
 
-    subgraph "Provider Support"
-        O[OpenAI]
-        A[Anthropic]
-        L[Ollama]
-        Ge[Gemini]
-        N[Nebius]
+    subgraph "🌐 Integration Layer"
+        K
+        L
     end
 
-    F --> O
-    F --> A
-    F --> L
-    F --> Ge
-    F --> N
-```
+    subgraph "⚡ Security & Control"
+        M[Human-in-Loop<br/>Tool Confirmation]
+        N[Exact Tool Selection<br/>Security Controls]
+    end
+
+    G --> M
+    M --> N
+
+    subgraph "Provider Ecosystem"
+        O[OpenAI<br/>GPT-4, GPT-3.5]
+        P[Anthropic<br/>Claude 3.5, Opus]
+        Q[Ollama<br/>Local Models]
+        R[Gemini<br/>2.5 Flash, Pro]
+        S[Nebius<br/>Kimi-K2]
+    end
+
+    I --> O
+    I --> P
+    I --> Q
+    I --> R
+    I --> S
+
+    L --> T[Chatbot UI<br/>Gradio/React/Web]
 
 ### System Architecture Overview
 
@@ -163,24 +208,26 @@ graph TD
 ### Data Flow
 
 ```
+
 Postman Collection JSON ──────┐
-                               │
+│
 CLI Tool (fluidtools) ────────▼
-                               │
+│
 TypeScript Tool Code ─────────▼
-                               │
+│
 Express/Fastify Server ──────▼
-                               │
+│
 FluidTools Client ───────────▼
-                               │
+│
 LangGraph Agent ─────────────▼
-                               │
+│
 LLM Provider + Tools ────────▼
-                               │
+│
 API Calls + Responses ───────▼
-                               │
+│
 User-Friendly Chat Response ──▼
-```
+
+````
 
 ## Demo 1: Gradio Integration (Public Testing)
 
@@ -201,7 +248,7 @@ Located in `./demo/server/`, this demo provides a complete Express server with G
 cd demo/server
 npm install
 npm start
-```
+````
 
 Backend runs on `http://localhost:3000`
 
@@ -326,6 +373,13 @@ fluidtools ./collections/my-api.json
 ## License
 
 ISC
+
+## Contributors
+
+We'd like to thank all the amazing people who have contributed to FluidTools! 👥
+
+- **[KartikJoshiUK](https://github.com/KartikJoshiUK)** - Creator & Lead Developer
+- **[Jatin Godnani](https://github.com/jatingodnani)** - Core Contributor
 
 ## Support
 

@@ -6,8 +6,8 @@ interface RateLimitEntry {
 
 class RateLimiter {
   private limits: Map<string, RateLimitEntry> = new Map();
-  private readonly FREE_TIER_LIMIT = 2;
-  private readonly RESET_INTERVAL_MS = 60 * 1000; // 1 hour
+  private readonly FREE_TIER_LIMIT = 10;
+  private readonly RESET_INTERVAL_MS = 12 * 60 * 1000; // 12 hour
 
   check(ip: string): {
     allowed: boolean;

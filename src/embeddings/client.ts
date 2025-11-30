@@ -48,7 +48,7 @@ export class EmbeddingClient {
   private modalUrl: string;
   private cache: Map<string, string[]>;
   private debug: boolean;
-  private readonly minToolsForEmbeddings: number = 10;
+  private readonly minToolsForEmbeddings: number = 50;
 
   /**
    * Create a new EmbeddingClient

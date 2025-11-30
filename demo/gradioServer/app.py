@@ -22,11 +22,11 @@ You can check balances, view transactions, transfer money, and manage tasks.
 Be friendly, concise, and always confirm before taking actions."""
 
 DEMO_ENV_VARS = """{
-  "API_BASE_URL": "http://localhost:8000"
+  "BASE_URL": "https://<YOUR SERVER IP>"
 }"""
 
 PROVIDERS = {
-    "nebius-free": {"name": "🆓 Nebius Free (10 requests/day)", "requires_key": False},
+    "nebius-free": {"name": "🆓 Nebius Free (10 requests/12 hour)", "requires_key": False},
     "openai": {"name": "💰 OpenAI (Your API Key)", "requires_key": True},
     "anthropic": {"name": "💰 Anthropic (Your API Key)", "requires_key": True},
     "gemini": {"name": "💰 Google Gemini (Your API Key)", "requires_key": True}
