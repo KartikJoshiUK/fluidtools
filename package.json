@@ -13,14 +13,31 @@
   "license": "ISC",
   "author": "Kartik Joshi",
   "type": "module",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts",
-      "import": "./dist/src/index.js"
-    }
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./client": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./tools": {
+      "types": "./dist/types/index.d.ts", 
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/esm/index.js", 
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -40,8 +57,13 @@
     "api"
   ],
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && tsc",
+    "build": "tsup --minify",
+    "build:dev": "tsup",
+    "build:watch": "tsup --watch",
+    "build:prod": "tsup --minify --sourcemap",
+    "build:analyze": "npm run build:prod && echo Build completed. Check dist/ for output files and source maps.",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "prepare": "npm run build"
   },
   "dependencies": {
@@ -63,9 +85,14 @@
   "devDependencies": {
     "@types/figlet": "^1.7.0",
     "@types/inquirer": "^9.0.9",
-    "@types/node": "^24.10.1"
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "fast-check": "^4.4.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "tsup": "^8.5.1"
   },
   "bin": {
-    "fluidtools": "dist/src/converters/cli.js"
+    "fluidtools": "./dist/cjs/cli.cjs"
   }
 }
