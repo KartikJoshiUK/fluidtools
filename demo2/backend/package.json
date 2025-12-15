@@ -1,12 +1,12 @@
 {
-  "name": "backend",
+  "name": "chatbot-backend-demo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "start": "tsc && node dist/index.js"
+    "start": "node ./dist/index.js"
   },
   "nodemonConfig": {
     "watch": [
@@ -16,7 +16,7 @@
     "ignore": [
       "dist"
     ],
-    "exec": "tsx ./src/index.ts"
+    "exec": "node --loader ts-node/esm ./src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -26,7 +26,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
-    "fluidtools": "^1.0.19"
+    "fluidtools": "^1.0.9"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
@@ -34,7 +34,6 @@
     "@types/nodemon": "^1.19.6",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
-    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }
