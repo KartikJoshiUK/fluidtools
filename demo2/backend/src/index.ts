@@ -41,7 +41,7 @@ const fluidtools = new FluidToolsClient(
   7,
   true,
   undefined,
-  { requireConfirmation: ["user_details"] },
+  undefined,
   {
     BASE_URL: "https://customer.acecloud.ai",
   }

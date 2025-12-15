@@ -277,10 +277,10 @@ class FluidToolsClient {
     logger(
       this.debug,
       "📄 [FluidToolsClient.query] Last message content:",
-      response.messages[response.messages.length - 1]?.content
+      response.messages.at(-1)?.content
     );
 
-    return response.messages[response.messages.length - 1]?.content;
+    return response.messages.at(-1)?.content;
   }
 
   /**
@@ -306,7 +306,7 @@ class FluidToolsClient {
   public async approveToolCall(toolCallId: string, accessToken?: string) {
     const threadId = this.getThreadId(accessToken);
     const result = await this.fluidTool.approveToolCall(toolCallId, threadId);
-    return result.messages[result.messages.length - 1]?.content;
+    return result.messages.at(-1)?.content;
   }
 
   /**
@@ -316,7 +316,7 @@ class FluidToolsClient {
   public async rejectToolCall(toolCallId: string, accessToken?: string) {
     const threadId = this.getThreadId(accessToken);
     const result = await this.fluidTool.rejectToolCall(toolCallId, threadId);
-    return result.messages[result.messages.length - 1]?.content;
+    return result.messages.at(-1)?.content;
   }
 
   /**

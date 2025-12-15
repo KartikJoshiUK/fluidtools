@@ -1,37 +1,10 @@
-# Dependencies
 node_modules
-
-# Build outputs
-dist/
-*.tsbuildinfo
-
-# Environment files
+dist
 .env
-.env.local
-.env.production
-
-# API configurations
 api.json
-
-# Testing artifacts
-testing/
-coverage/
-
-# Development artifacts
-multi-agent/
-venv/
-.gradio/
-.kiro
-
-# Demo uploads
-demo/server/uploads/
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
+testing
+api.json
+multi-agent
+venv
+.gradio
+demo/server/uploads
